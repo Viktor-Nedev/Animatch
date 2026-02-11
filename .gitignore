@@ -1,0 +1,38 @@
+﻿
+@"
+# Visual Studio
+.vs/
+bin/
+obj/
+*.user
+*.suo
+*.userprefs
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+build/
+[Bb]in/
+[Oo]bj/
+
+# IDE files
+*.sln.ide
+*.swp
+*.swo
+*~
+*.tmp
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# NuGet Packages
+packages/
+*.nupkg
+
+# VS Code
+.vscode/
+"@ | Out-File -FilePath .gitignore -Encoding UTF8
