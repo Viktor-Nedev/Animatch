@@ -1,0 +1,62 @@
+﻿@model IEnumerable<Animatch.Models.Animal>
+
+@{
+    ViewData["Title"] = "Всички животни";
+}
+
+<h1 class="text-center my-4">Открий приятел за твоето животно!</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-success mb-3">
+        <i class="bi bi-plus-circle"></i> Добави ново животно
+    </a>
+</p>
+
+<div class="row">
+    @foreach (var animal in Model)
+    {
+        <div class="col-md-4 col-sm-6 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">@animal.Name</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">
+                        @animal.Species
+                        @if (!string.IsNullOrEmpty(animal.Breed))
+                        {
+                            <span>• @animal.Breed</span>
+                        }
+                    </h6>
+
+                    <p class="card-text">
+                        @if (!string.IsNullOrEmpty(animal.Town))
+                        {
+                            <small class="text-muted d-block">
+                                <i class="bi bi-geo-alt"></i> @animal.Town
+                            </small>
+                        }
+
+                        <span class="badge bg-primary mt-2">
+                            @(animal.Category?.Name ?? "Без категория")
+                        </span>
+                    </p>
+
+                    <div class="d-flex justify-content-between mt-3">
+                        <a asp-action="Details" asp-route-id="@animal.Id"
+                           class="btn btn-sm btn-info">Детайли</a>
+                        <a asp-action="Edit" asp-route-id="@animal.Id"
+                           class="btn btn-sm btn-warning">Редактирай</a>
+                        <a asp-action="Delete" asp-route-id="@animal.Id"
+                           class="btn btn-sm btn-danger">Изтрий</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info text-center">
+        Все още няма добавени животни. Бъди първият!
+    </div>
+}
