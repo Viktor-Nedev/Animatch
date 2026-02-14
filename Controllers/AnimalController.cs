@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Animatch.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Animatch.ViewModels.Animal;
 
 namespace Animatch.Controllers
 {
@@ -93,5 +94,45 @@ namespace Animatch.Controllers
             ViewBag.Categories = new SelectList(categories, "Id", "Name", animal.CategoryId);
             return View(animal);
         }
+
+
+
+
+
+
+
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var animal = await context.Animals
+                .Include(a => a.Category)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (animal == null)
+            {
+                return NotFound();
+            }
+
+            var viewModel = new AnimalDetailsViewModel
+            {
+                Id = animal.Id,
+                Name = animal.Name,
+                Species = animal.Species,
+                Breed = animal.Breed,
+                Town = animal.Town,
+                Description = animal.Description,
+                CategoryName = animal.Category?.Name ?? "Няма категория"
+            };
+
+            return View(viewModel);
+        }
+
+
+
+
     }
 }
