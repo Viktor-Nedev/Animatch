@@ -29,7 +29,11 @@ namespace Animatch.Controllers
 				.ToList();
 
 
-			return View(animals);
+            ViewBag.Categories = context.Categories.ToList() ?? new List<Category>();
+            ViewBag.Towns = animals.Select(a => a.Town).Where(t => !string.IsNullOrEmpty(t)).Distinct().OrderBy(t => t).ToList() ?? new List<string>();
+
+
+            return View(animals);
 		}
 	}
 }

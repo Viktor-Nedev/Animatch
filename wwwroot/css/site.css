@@ -20,3 +20,183 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+
+
+
+
+
+
+:root {
+    --primary-green: #2e7d32;
+    --secondary-green: #4caf50; 
+    --light-green: #c8e6c9; 
+    --accent-green: #81c784;
+    --hover-green: #1b5e20; 
+    --background-green: #f1f8e9; 
+}
+
+body {
+    background-color: var(--background-green);
+    font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+}
+
+.navbar {
+    background: linear-gradient(135deg, var(--primary-green), var(--secondary-green)) !important;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.navbar-brand, .nav-link {
+    color: white !important;
+    font-weight: 500;
+}
+
+    .nav-link:hover {
+        background-color: rgba(255,255,255,0.1);
+        border-radius: 5px;
+    }
+
+.btn-primary {
+    background-color: var(--primary-green);
+    border-color: var(--primary-green);
+}
+
+    .btn-primary:hover {
+        background-color: var(--hover-green);
+        border-color: var(--hover-green);
+    }
+
+.btn-success {
+    background-color: var(--secondary-green);
+    border-color: var(--secondary-green);
+}
+
+    .btn-success:hover {
+        background-color: var(--primary-green);
+        border-color: var(--primary-green);
+    }
+
+.card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background: white;
+    overflow: hidden;
+}
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 24px rgba(46, 125, 50, 0.2);
+    }
+
+.card-header {
+    background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+    color: white;
+    font-weight: 600;
+    border: none;
+}
+
+.card-footer {
+    background: var(--light-green);
+    border-top: 2px solid var(--accent-green);
+}
+
+.badge-category {
+    background-color: var(--accent-green);
+    color: var(--primary-green);
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 20px;
+}
+
+.animal-card {
+    border-left: 5px solid var(--primary-green);
+    margin-bottom: 20px;
+}
+
+.page-title {
+    color: var(--primary-green);
+    font-weight: 700;
+    position: relative;
+    padding-bottom: 15px;
+    margin-bottom: 30px;
+}
+
+    .page-title:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-green), var(--secondary-green));
+        border-radius: 2px;
+    }
+
+.form-control:focus {
+    border-color: var(--secondary-green);
+    box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
+}
+
+.table-hover tbody tr:hover {
+    background-color: var(--light-green);
+}
+
+.alert-info {
+    background-color: var(--light-green);
+    border-color: var(--accent-green);
+    color: var(--primary-green);
+}
+
+.footer {
+    background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+    color: white;
+    padding: 20px 0;
+    margin-top: 50px;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.6s ease-out;
+}
+
+.hero-section {
+    background: linear-gradient(135deg, rgba(46,125,50,0.9), rgba(76,175,80,0.9)), url('/images/hero-bg.jpg');
+    background-size: cover;
+    color: white;
+    padding: 100px 0;
+    margin-bottom: 50px;
+    border-radius: 0 0 50px 50px;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--primary-green);
+}
+
+.stat-label {
+    color: var(--secondary-green);
+    font-weight: 600;
+}
