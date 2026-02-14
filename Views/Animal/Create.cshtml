@@ -1,0 +1,78 @@
+﻿@model Animatch.Models.Animal
+
+
+@{
+    ViewData["Title"] = "Добави ново животно";
+}
+
+<h1 class="text-center my-4">Намери приятел на своят домашен любимец!</h1>
+
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-body">
+                <form asp-action="Create" method="post" asp-antiforgery="true">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="Name" class="control-label">Име</label>
+                                <input asp-for="Name" class="form-control" placeholder="Въведете име..." />
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label asp-for="Species" class="control-label">Вид</label>
+                                <input asp-for="Species" class="form-control" placeholder="Напр. Куче, Котка..." />
+                                <span asp-validation-for="Species" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label asp-for="Breed" class="control-label">Порода</label>
+                                <input asp-for="Breed" class="form-control" placeholder="Порода (по избор)..." />
+                                <span asp-validation-for="Breed" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label asp-for="CategoryId" class="control-label">Категория</label>
+                                <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.Categories">
+                                    <option value="">-- Избери категория --</option>
+                                </select>
+                                <span asp-validation-for="CategoryId" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="Town" class="control-label">Населено място</label>
+                                <input asp-for="Town" class="form-control" placeholder="Град..." />
+                                <span asp-validation-for="Town" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label asp-for="Description" class="control-label">Описание</label>
+                                <textarea asp-for="Description" class="form-control" rows="8" placeholder="Разкажете малко повече за животното..."></textarea>
+                                <span asp-validation-for="Description" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mt-4 text-center">
+                        <button type="submit" class="btn btn-success px-5">
+                            <i class="bi bi-save"></i> Запази
+                        </button>
+                        <a asp-action="Index" class="btn btn-secondary px-4 ms-2">← Назад</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

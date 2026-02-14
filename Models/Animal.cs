@@ -26,12 +26,12 @@ namespace Animatch.Models
 
 
 		[MaxLength(BreedMaxLength)]
-		public string Breed { get; set; }
+		public string? Breed { get; set; }
 
 
 
 		[MaxLength(TownMaxLength)]
-		public string Town { get; set; }
+		public string? Town { get; set; }
 
 
 
