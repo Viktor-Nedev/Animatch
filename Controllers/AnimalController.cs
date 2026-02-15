@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Animatch.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Animatch.ViewModels.Animal;
 
 namespace Animatch.Controllers
 {
@@ -44,16 +43,6 @@ namespace Animatch.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(Animal animal)
         {
-            if (string.IsNullOrEmpty(animal.Breed))
-            {
-                ModelState.Remove("Breed");
-            }
-
-            if (string.IsNullOrEmpty(animal.Town))
-            {
-                ModelState.Remove("Town");
-            }
-
             var categoryExists = context.Categories.Any(c => c.Id == animal.CategoryId);
             if (!categoryExists)
             {
@@ -64,7 +53,6 @@ namespace Animatch.Controllers
             {
                 try
                 {
-                    animal.Category = null;
                     context.Animals.Add(animal);
                     int result = context.SaveChanges();
 
@@ -85,6 +73,91 @@ namespace Animatch.Controllers
             return View(animal);
         }
 
+        [HttpGet]
+        public IActionResult Edit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var animal = context.Animals
+                .Include(a => a.Category)
+                .FirstOrDefault(a => a.Id == id);
+
+            if (animal == null)
+            {
+                return NotFound();
+            }
+
+            var categories = context.Categories.ToList();
+            ViewBag.Categories = new SelectList(categories, "Id", "Name", animal.CategoryId);
+
+            return View(animal);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(int id, Animal animal)
+        {
+            if (id != animal.Id)
+            {
+                return NotFound();
+            }
+
+            var categoryExists = context.Categories.Any(c => c.Id == animal.CategoryId);
+            if (!categoryExists)
+            {
+                ModelState.AddModelError("CategoryId", "Невалидна категория");
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var existingAnimal = context.Animals.Find(id);
+                    if (existingAnimal == null)
+                    {
+                        return NotFound();
+                    }
+
+                    existingAnimal.Name = animal.Name;
+                    existingAnimal.Species = animal.Species;
+                    existingAnimal.Breed = animal.Breed;
+                    existingAnimal.Town = animal.Town;
+                    existingAnimal.Description = animal.Description;
+                    existingAnimal.CategoryId = animal.CategoryId;
+
+                    context.Update(existingAnimal);
+                    int result = context.SaveChanges();
+
+                    if (result > 0)
+                    {
+                        TempData["Success"] = "Животното е редактирано успешно!";
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!AnimalExists(animal.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", "Грешка при запис: " + ex.Message);
+                }
+            }
+
+            var categories = context.Categories.ToList();
+            ViewBag.Categories = new SelectList(categories, "Id", "Name", animal.CategoryId);
+            return View(animal);
+        }
 
         [HttpGet]
         public IActionResult Delete(int? id)
@@ -149,7 +222,7 @@ namespace Animatch.Controllers
                 return NotFound();
             }
 
-            var viewModel = new AnimalDetailsViewModel
+            var viewModel = new Animatch.ViewModels.Animal.AnimalDetailsViewModel
             {
                 Id = animal.Id,
                 Name = animal.Name,
@@ -157,7 +230,7 @@ namespace Animatch.Controllers
                 Breed = animal.Breed,
                 Town = animal.Town,
                 Description = animal.Description,
-                CategoryName = animal.Category.Name
+                CategoryName = animal.Category?.Name ?? "Няма категория"
             };
 
             return View(viewModel);

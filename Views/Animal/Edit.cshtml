@@ -1,0 +1,115 @@
+﻿@model Animatch.Models.Animal
+
+@{
+    ViewData["Title"] = "Редактирай животно";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-lg">
+                <div class="card-header bg-success text-white py-3">
+                    <h2 class="mb-0 text-center">
+                        <i class="bi bi-pencil-square"></i> Редактирай @Model.Name
+                    </h2>
+                </div>
+
+                <div class="card-body p-4">
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            @TempData["Success"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <form asp-action="Edit">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                        <input type="hidden" asp-for="Id" />
+
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="Name" class="form-control" placeholder="Име">
+                                    <label asp-for="Name">
+                                        <i class="bi bi-tag text-success"></i> Име
+                                    </label>
+                                    <span asp-validation-for="Name" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="Species" class="form-control" placeholder="Вид">
+                                    <label asp-for="Species">
+                                        <i class="bi bi-tree text-success"></i> Вид
+                                    </label>
+                                    <span asp-validation-for="Species" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="Breed" class="form-control" placeholder="Порода">
+                                    <label asp-for="Breed">
+                                        <i class="bi bi-stars text-success"></i> Порода
+                                    </label>
+                                    <span asp-validation-for="Breed" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="Town" class="form-control" placeholder="Град">
+                                    <label asp-for="Town">
+                                        <i class="bi bi-geo-alt text-success"></i> Град
+                                    </label>
+                                    <span asp-validation-for="Town" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.Categories">
+                                        <option value="">-- Избери категория --</option>
+                                    </select>
+                                    <label asp-for="CategoryId">
+                                        <i class="bi bi-folder text-success"></i> Категория
+                                    </label>
+                                    <span asp-validation-for="CategoryId" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <textarea asp-for="Description" class="form-control" style="height: 150px;" placeholder="Описание"></textarea>
+                                    <label asp-for="Description">
+                                        <i class="bi bi-chat-text text-success"></i> Описание
+                                    </label>
+                                    <span asp-validation-for="Description" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-12 mt-4">
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <button type="submit" class="btn btn-warning btn-lg px-5">
+                                        <i class="bi bi-check-circle"></i> Запази промените
+                                    </button>
+                                    <a asp-action="Index" class="btn btn-outline-success btn-lg px-5">
+                                        <i class="bi bi-x-circle"></i> Отказ
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
