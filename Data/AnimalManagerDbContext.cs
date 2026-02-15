@@ -3,9 +3,10 @@
 namespace Animatch.Data
 {
 	using Animatch.Models;
+	using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 	using Microsoft.EntityFrameworkCore;
 
-	public class AnimalManagerDbContext : DbContext
+	public class AnimalManagerDbContext : IdentityDbContext
 	{
 
 		public AnimalManagerDbContext(DbContextOptions<AnimalManagerDbContext> dbContextOptions)

@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Animatch.Data.Migrations
 {
-	[DbContext(typeof(ApplicationDbContext))]
+	[DbContext(typeof(AnimalManagerDbContext))]
 	[Migration("00000000000000_CreateIdentitySchema")]
 	partial class CreateIdentitySchema
 	{

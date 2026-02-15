@@ -1,6 +1,7 @@
 using Animatch.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace Animatch
 {
@@ -10,27 +11,18 @@ namespace Animatch
 		{
 			WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-			string? connectionStringa = builder.Configuration.GetConnectionString("ConnectionToSQLServer");
+			string connectionString = builder.Configuration.GetConnectionString("ConnectionToSQLServer") ?? throw new InvalidOperationException("Connection string 'ConnectionToSQLServer' not found.");
 
-
-
-			// Add services to the container.
-			var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-			builder.Services.AddDbContext<ApplicationDbContext>(options =>
+			builder.Services.AddDbContext<AnimalManagerDbContext>(options =>
 				options.UseSqlServer(connectionString));
 			builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
+			builder.Services.AddDefaultIdentity<IdentityUser>(options => {
 
+				ConfigyIdentityOptions(options, builder.Configuration);
 
-			builder.Services.AddDbContext<AnimalManagerDbContext>(options =>
-			{ options
-
-					.UseSqlServer(connectionStringa);
-			});
-
-
-			builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-				.AddEntityFrameworkStores<ApplicationDbContext>();
+            })
+				.AddEntityFrameworkStores<AnimalManagerDbContext>();
 			builder.Services.AddControllersWithViews();
 
 			WebApplication app = builder.Build();
@@ -61,5 +53,43 @@ namespace Animatch
 
 			app.Run();
 		}
-	}
+
+
+		private static void ConfigyIdentityOptions(IdentityOptions options, ConfigurationManager configuration) {
+
+			
+            options.SignIn.RequireConfirmedAccount = configuration
+                .GetValue<bool>("IdentityOptions:SignIn:RequireConfirmedAccount");
+            options.SignIn.RequireConfirmedPhoneNumber = configuration
+                .GetValue<bool>("IdentityOptions:SignIn:RequireConfirmedPhoneNumber");
+            options.SignIn.RequireConfirmedEmail = configuration
+                .GetValue<bool>("IdentityOptions:SignIn:RequireConfirmedEmail");
+
+            options.User.RequireUniqueEmail = configuration
+				.GetValue<bool>("IdentityOptions:User:RequireUniqueEmail");
+
+            options.Lockout.MaxFailedAccessAttempts = configuration
+				.GetValue<int>("IdentityOptions:Lockout:MaxFailedAccessAttempts");
+            options.Lockout.DefaultLockoutTimeSpan = configuration
+				.GetValue<TimeSpan>("IdentityOptions:Lockout:DefaultLockoutTimeSpan");
+
+            options.Password.RequireDigit = configuration
+				.GetValue<bool>("IdentityOptions:Password:RequireDigit");
+            options.Password.RequireLowercase = configuration
+				.GetValue<bool>("IdentityOptions:Password:RequireLowercase");
+            options.Password.RequireNonAlphanumeric = configuration
+				.GetValue<bool>("IdentityOptions:Password:RequireNonAlphanumeric");
+            options.Password.RequireUppercase = configuration
+				.GetValue<bool>("IdentityOptions:Password:RequireUppercase");
+            options.Password.RequiredLength = configuration
+				.GetValue<int>("IdentityOptions:Password:RequiredLength");
+            options.Password.RequiredUniqueChars = configuration
+				.GetValue<int>("IdentityOptions:Password:RequiredUniqueChars");
+
+
+
+
+        }
+
+    }
 }

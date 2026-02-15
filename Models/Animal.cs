@@ -38,7 +38,7 @@ namespace Animatch.Models
 		[Required]
 		[MinLength(DescriptionMinLength)]
 		[MaxLength(DescriptionMaxLength)]
-		public string Description { get; set; }
+		public string Description { get; set; } = null!;
 
 
 
