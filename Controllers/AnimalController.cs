@@ -42,12 +42,8 @@ namespace Animatch.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-
-
-
         public IActionResult Create(Animal animal)
         {
-           
             if (string.IsNullOrEmpty(animal.Breed))
             {
                 ModelState.Remove("Breed");
@@ -58,22 +54,17 @@ namespace Animatch.Controllers
                 ModelState.Remove("Town");
             }
 
-        
             var categoryExists = context.Categories.Any(c => c.Id == animal.CategoryId);
             if (!categoryExists)
             {
                 ModelState.AddModelError("CategoryId", "Невалидна категория");
             }
 
-            ModelState.Remove("Category");
-
             if (ModelState.IsValid)
             {
                 try
                 {
-                 
                     animal.Category = null;
-
                     context.Animals.Add(animal);
                     int result = context.SaveChanges();
 
@@ -89,28 +80,69 @@ namespace Animatch.Controllers
                 }
             }
 
-         
             var categories = context.Categories.ToList();
             ViewBag.Categories = new SelectList(categories, "Id", "Name", animal.CategoryId);
             return View(animal);
         }
 
 
-
-
-
-
-
-        public async Task<IActionResult> Details(int? id)
+        [HttpGet]
+        public IActionResult Delete(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var animal = await context.Animals
+            var animal = context.Animals
                 .Include(a => a.Category)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefault(a => a.Id == id);
+
+            if (animal == null)
+            {
+                return NotFound();
+            }
+
+            return View(animal);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteConfirmed(int id)
+        {
+            try
+            {
+                var animal = context.Animals.Find(id);
+                if (animal != null)
+                {
+                    context.Animals.Remove(animal);
+                    int result = context.SaveChanges();
+
+                    if (result > 0)
+                    {
+                        TempData["Success"] = "Животното е изтрито успешно!";
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Грешка при изтриване: " + ex.Message;
+                return RedirectToAction(nameof(Index));
+            }
+        }
+
+        [HttpGet]
+        public IActionResult Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var animal = context.Animals
+                .Include(a => a.Category)
+                .FirstOrDefault(a => a.Id == id);
 
             if (animal == null)
             {
@@ -125,14 +157,15 @@ namespace Animatch.Controllers
                 Breed = animal.Breed,
                 Town = animal.Town,
                 Description = animal.Description,
-                CategoryName = animal.Category?.Name ?? "Няма категория"
+                CategoryName = animal.Category.Name
             };
 
             return View(viewModel);
         }
 
-
-
-
+        private bool AnimalExists(int id)
+        {
+            return context.Animals.Any(e => e.Id == id);
+        }
     }
 }
