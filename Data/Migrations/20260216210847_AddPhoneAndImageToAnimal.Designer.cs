@@ -4,16 +4,19 @@ using Animatch.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Animatch.Migrations
+namespace Animatch.Data.Migrations
 {
     [DbContext(typeof(AnimalManagerDbContext))]
-    partial class AnimalManagerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260216210847_AddPhoneAndImageToAnimal")]
+    partial class AddPhoneAndImageToAnimal
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -81,7 +84,7 @@ namespace Animatch.Migrations
                             Breed = "Немска овчарка",
                             CategoryId = 1,
                             Description = "Търся приятел за дълги разходки в Борисовата градина. Обичам да гоня топка и да тичам до езерото. Имам безкрайно много енергия!",
-                            ImageUrl = "https://miau.bg/files/1200x800/nemska-ovcharka2.webp",
+                            ImageUrl = "https://placehold.co/600x400?text=Dog",
                             Name = "Рекс",
                             PhoneNumber = "0881111111",
                             Species = "Куче",
@@ -93,7 +96,7 @@ namespace Animatch.Migrations
                             Breed = "Златен ретривър",
                             CategoryId = 1,
                             Description = "Супер дружелюбна, обичам всички. Търся куче за игра в парк 'Лаута'. Нося си топка и фризби. Обичам и плуване!",
-                            ImageUrl = "https://animoetc.com/cdn/shop/articles/AdobeStock_67967166.jpg?v=1743684891",
+                            ImageUrl = "https://placehold.co/600x400?text=Dog",
                             Name = "Бела",
                             PhoneNumber = "0882222222",
                             Species = "Куче",
@@ -105,7 +108,7 @@ namespace Animatch.Migrations
                             Breed = "Джак Ръсел",
                             CategoryId = 1,
                             Description = "Малък, но бърз! Търся приятел за гоненица по плажа. Обичам да ровя в пясъка и да лая на вълните.",
-                            ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSWrp8aabL_Woah30nQChpwR1HbfGZdROmv3ceN8c8sjVTZYdVMnBLQeDZ8dFmG43mC00MIveiakCHE2LSy4bk88kU03YhB9QlgtDLXBw&s=10",
+                            ImageUrl = "https://placehold.co/600x400?text=Dog",
                             Name = "Боби",
                             PhoneNumber = "0883333333",
                             Species = "Куче",
@@ -117,7 +120,7 @@ namespace Animatch.Migrations
                             Breed = "Хъски",
                             CategoryId = 1,
                             Description = "Обожавам снега! Търся друго хъски или активно куче за планински преходи. Карам и шейна (шегувам се... или не?).",
-                            ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/a/a3/Black-Magic-Big-Boy.jpg",
+                            ImageUrl = "https://placehold.co/600x400?text=Dog",
                             Name = "Луна",
                             PhoneNumber = "0884444444",
                             Species = "Куче",
@@ -129,7 +132,7 @@ namespace Animatch.Migrations
                             Breed = "Улична принцеса",
                             CategoryId = 2,
                             Description = "Търся коте за приятел. Обичам да гледам птици заедно и да спим на слънце. Нося ти подаръци (мишки).",
-                            ImageUrl = "https://m.netinfo.bg/media/images/50202/50202954/624-400-ulichna-kotka.jpg",
+                            ImageUrl = "https://placehold.co/600x400?text=Cat",
                             Name = "Гизда",
                             PhoneNumber = "0885555555",
                             Species = "Котка",
@@ -141,7 +144,7 @@ namespace Animatch.Migrations
                             Breed = "Черна",
                             CategoryId = 2,
                             Description = "Търся спокойно коте за приятел. Обичам да се търкалям по топлите плочки и да ям риба. Не съм за врачка!",
-                            ImageUrl = "https://cdn.marica.bg/images/marica.bg/889/1200_cherna-kotka-spasitelka.jpg",
+                            ImageUrl = "https://placehold.co/600x400?text=Cat",
                             Name = "Салем",
                             PhoneNumber = "0886666666",
                             Species = "Котка",
@@ -153,7 +156,7 @@ namespace Animatch.Migrations
                             Breed = "Сиамска",
                             CategoryId = 2,
                             Description = "Елегантна и разговорлива. Търся приятел, който обича да 'разговаря'. Мяукам на различни мелодии!",
-                            ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3uIKtBwcbAwSi6o_uzUqgp016-A3D4bswPQ&s",
+                            ImageUrl = "https://placehold.co/600x400?text=Cat",
                             Name = "Зора",
                             PhoneNumber = "0887777777",
                             Species = "Котка",
@@ -165,7 +168,7 @@ namespace Animatch.Migrations
                             Breed = "Африкански сив",
                             CategoryId = 3,
                             Description = "Говоря 50 думи. Търся приятел за разговори и свирене. Ще те науча да казваш 'Здрасти'!",
-                            ImageUrl = "https://static.bnr.bg/gallery/b9/b9ab15c0df0ee58648c4c8d48aa7f9c3.jpg",
+                            ImageUrl = "https://placehold.co/600x400?text=Parrot",
                             Name = "Жако",
                             PhoneNumber = "0888888888",
                             Species = "Папагал",
@@ -177,7 +180,7 @@ namespace Animatch.Migrations
                             Breed = "Бял",
                             CategoryId = 3,
                             Description = "Танцувам! Сериозно, имам ритъм. Търся приятел, който да ме гледа как се клатя. Обичам фъстъци.",
-                            ImageUrl = "https://miau.bg/files/1200x800/cacadu.webp",
+                            ImageUrl = "https://placehold.co/600x400?text=Cockatoo",
                             Name = "Пио",
                             PhoneNumber = "0889999999",
                             Species = "Какаду",
@@ -189,7 +192,7 @@ namespace Animatch.Migrations
                             Breed = "Джудже",
                             CategoryId = 4,
                             Description = "Търся зайче за приятел. Обичам да скачам, да гриза моркови и да си ровя в сеното. Ще тичаме заедно!",
-                            ImageUrl = "https://miau.bg/files/lib/500x350/baby-rabbit-carrot1.webp",
+                            ImageUrl = "https://placehold.co/600x400?text=Rabbit",
                             Name = "Хоп",
                             PhoneNumber = "0870123456",
                             Species = "Заек",
@@ -201,7 +204,7 @@ namespace Animatch.Migrations
                             Breed = "Брадат дракон",
                             CategoryId = 7,
                             Description = "Търся друг гущер за приятел. Обичам да се пека на лампата и да ям скакалци. Махам си с ръка за поздрав.",
-                            ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQtyukiUUwuqFgAHnUDE9QkkiUetBo50Uwnzw&s",
+                            ImageUrl = "https://placehold.co/600x400?text=Lizard",
                             Name = "Спайк",
                             PhoneNumber = "0871234567",
                             Species = "Гущер",
@@ -213,7 +216,7 @@ namespace Animatch.Migrations
                             Breed = "Див",
                             CategoryId = 11,
                             Description = "Дойдох сам в градината. Търся приятел за вечерни разходки. Ям кучешка храна и съм много сладък.",
-                            ImageUrl = "https://www.kakvoe.eu/wp-content/uploads/2020/06/%D1%82%D0%B0%D1%80%D0%B0%D0%BB%D0%B5%D0%B6.jpeg",
+                            ImageUrl = "https://placehold.co/600x400?text=Hedgehog",
                             Name = "Бодльо",
                             PhoneNumber = "0872345678",
                             Species = "Таралеж",

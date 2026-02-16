@@ -40,6 +40,17 @@ namespace Animatch.Models
 		[MaxLength(DescriptionMaxLength)]
 		public string Description { get; set; } = null!;
 
+		[Required(ErrorMessage = "Телефонният номер е задължителен.")]
+		[StringLength(PhoneNumberMaxLength, MinimumLength = PhoneNumberMinLength)]
+		[RegularExpression(@"^\d{10}$", ErrorMessage = "Телефонният номер трябва да е 10 цифри.")]
+		public string PhoneNumber { get; set; } = null!;
+
+		[MaxLength(2048)]
+		[Url]
+		public string? ImageUrl { get; set; }
+
+		public string? OwnerId { get; set; }
+
 
 
 		/// <summary>

@@ -31,7 +31,6 @@ namespace Animatch.Data.Migrations
 				SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
 				b.Property<string>("Breed")
-					.IsRequired()
 					.HasMaxLength(200)
 					.HasColumnType("nvarchar(200)");
 
@@ -43,10 +42,22 @@ namespace Animatch.Data.Migrations
 					.HasMaxLength(1000)
 					.HasColumnType("nvarchar(1000)");
 
+				b.Property<string>("ImageUrl")
+					.HasMaxLength(2048)
+					.HasColumnType("nvarchar(2048)");
+
 				b.Property<string>("Name")
 					.IsRequired()
 					.HasMaxLength(100)
 					.HasColumnType("nvarchar(100)");
+
+				b.Property<string>("OwnerId")
+					.HasColumnType("nvarchar(max)");
+
+				b.Property<string>("PhoneNumber")
+					.IsRequired()
+					.HasMaxLength(10)
+					.HasColumnType("nvarchar(10)");
 
 				b.Property<string>("Species")
 					.IsRequired()
@@ -54,7 +65,6 @@ namespace Animatch.Data.Migrations
 					.HasColumnType("nvarchar(200)");
 
 				b.Property<string>("Town")
-					.IsRequired()
 					.HasMaxLength(100)
 					.HasColumnType("nvarchar(100)");
 
