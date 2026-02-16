@@ -1,0 +1,27 @@
+﻿@page
+@model LogoutModel
+@{
+    ViewData["Title"] = "Log out";
+}
+
+<div class="auth-shell">
+    <div class="auth-card fade-in">
+        <div class="auth-header">
+            <p class="auth-kicker">Animatch</p>
+            <h1>@ViewData["Title"]</h1>
+            <p class="auth-subtitle">Искаш ли да излезеш от профила си?</p>
+        </div>
+        @{
+            if (User.Identity?.IsAuthenticated ?? false)
+            {
+                <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/", new { area = "" })" method="post">
+                    <button type="submit" class="w-100 btn btn-lg btn-primary">Изход</button>
+                </form>
+            }
+            else
+            {
+                <p class="auth-footer">Излезе успешно от приложението.</p>
+            }
+        }
+    </div>
+</div>
