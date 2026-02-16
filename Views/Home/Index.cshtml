@@ -1,8 +1,86 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@{
+    Layout = null;
+    ViewData["Title"] = "Начало";
 }
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="home-classic">
+    <header class="home-classic__header">
+        <img class="home-classic__logo" src="~/images/logo.png" alt="Animatch logo" />
+    </header>
+    <main class="home-classic__wrap">
+        <section class="home-classic__hero home-classic__hero--wide">
+            <div class="home-classic__brand">Animatch</div>
+            <h1 class="home-classic__title home-classic__title--big">Открий приятел за твоят домашен любимец!</h1>
+            <p class="home-classic__lead">
+                Animatch е проект, който свързва собственици на домашни любимци,
+                които търсят приятел за техният домашен любимец, повреме на разходка или игра в парка.
+            </p>
+            <div class="home-classic__actions">
+                <a class="btn btn-success home-classic__btn" href="/Identity/Account/Login">Вход</a>
+                <a class="btn btn-outline-success home-classic__btn" href="/Identity/Account/Register">Регистрация</a>
+            </div>
+        </section>
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+        <section class="home-classic__grid home-classic__grid--spacious" id="mission">
+            <div class="home-classic__card">
+                <h2>Предназначение</h2>
+                <p>
+                  Много животни остават сами вкъщи, докато стопаните им са на работа или училище, а когато стопанина се прибера може да няма време за тях.
+                  Animatch помага на тези животни да намерят приятел, с когото да играят и да се забавляват.
+                </p>
+            </div>
+            <div class="home-classic__card">
+                <h2>За мен</h2>
+                <p>
+                    Аз съм Виктор Недев на 17 години от Велико Търново и уча в ПМГ "Васил Друмев".
+                    Харесва ми да създавам проекти, които имат смисъл и помагат на хората и животните.
+                </p>
+            </div>
+            <div class="home-classic__card">
+                <h2>Как работи</h2>
+                <p>
+                    Разглеждаш животните, свързваш се с собственика и се уговаряте за среща.
+                </p>
+            </div>
+        </section>
+
+        <section class="home-classic__feature">
+            <div class="home-classic__feature-text">
+                <h2>Защо Animatch?</h2>
+                <p>
+                    Всяко животно заслужава приятел с което да играе и да се забавлява. С Animatch прави процеса по
+                    намиране на приятел по-лесен и по-бърз.
+                </p>
+                <ul class="home-classic__list">
+                    <li>Различни животни</li>
+                    <li>Създаване на обява за животно</li>
+                    <li>Редактиране на обява</li>
+                    <li>Изтриване на обява</li>
+                </ul>
+            </div>
+            <div class="home-classic__feature-box">
+                <h3>Стъпки</h3>
+                <ol class="home-classic__steps">
+                    <li>Открий животно</li>
+                    <li>Свържи се</li>
+                    <li>Сближи домашният ти любимец с нов приятел</li>
+                </ol>
+            </div>
+        </section>
+    </main>
+
+    <footer class="home-classic__footer">
+        <div>Animatch © 2026</div>
+        <div>Създадено с грижа за животните</div>
+    </footer>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
