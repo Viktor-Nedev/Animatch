@@ -62,9 +62,11 @@ body {
 }
 
 .navbar-logo {
-    height: 32px;
-    width: auto;
+    height: 200px;
+    width: 250px;
     display: block;
+    margin-top: -50px;
+    margin-bottom: -70px;
 }
 
 .btn-primary {
@@ -164,6 +166,7 @@ body {
     color: white;
     padding: 20px 0;
     margin-top: 50px;
+    text-align: center;
 }
 
 @keyframes fadeIn {
@@ -457,6 +460,14 @@ body {
     height: clamp(440px, 72vw, 540px);
     width: auto;
     margin-top: -150px;
+}
+
+.animal-index .animal-filters {
+    margin-bottom: 24px;
+}
+
+.animal-index #animalsGrid {
+    margin-bottom: 40px;
 }
 
 .home-classic__hero {
