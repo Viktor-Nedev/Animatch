@@ -1,4 +1,4 @@
-﻿using Animatch.Data;
+using Animatch.Data;
 using Microsoft.AspNetCore.Mvc;
 using Animatch.Models;
 using Microsoft.EntityFrameworkCore;
@@ -11,10 +11,12 @@ namespace Animatch.Controllers
     public class AnimalController : Controller
     {
         private readonly AnimalManagerDbContext context;
+        private readonly IConfiguration configuration;
 
-        public AnimalController(AnimalManagerDbContext context)
+        public AnimalController(AnimalManagerDbContext context, IConfiguration configuration)
         {
             this.context = context;
+            this.configuration = configuration;
         }
 
         [HttpGet]
@@ -36,6 +38,17 @@ namespace Animatch.Controllers
                 .OrderBy(t => t)
                 .ToList();
 
+            return View(animals);
+        }
+
+        [HttpGet]
+        public IActionResult Map()
+        {
+            var animals = context.Animals
+                .Where(a => a.Latitude.HasValue && a.Longitude.HasValue)
+                .ToList();
+
+            ViewBag.MapboxKey = configuration["MAPBOX_KEY"];
             return View(animals);
         }
 
@@ -152,6 +165,8 @@ namespace Animatch.Controllers
                     existingAnimal.CategoryId = animal.CategoryId;
                     existingAnimal.PhoneNumber = animal.PhoneNumber;
                     existingAnimal.ImageUrl = animal.ImageUrl;
+                    existingAnimal.Latitude = animal.Latitude;
+                    existingAnimal.Longitude = animal.Longitude;
 
                     context.Update(existingAnimal);
                     int result = context.SaveChanges();
@@ -259,7 +274,7 @@ namespace Animatch.Controllers
                 return NotFound();
             }
 
-            var viewModel = new Animatch.ViewModels.Animal.AnimalDetailsViewModel
+            var viewModel = new Animatch.ViewModels.AnimalDetailsViewModel
             {
                 Id = animal.Id,
                 Name = animal.Name,
@@ -269,7 +284,9 @@ namespace Animatch.Controllers
                 Description = animal.Description,
                 PhoneNumber = animal.PhoneNumber,
                 ImageUrl = animal.ImageUrl,
-                CategoryName = animal.Category?.Name ?? "Няма категория"
+                CategoryName = animal.Category?.Name ?? "Няма категория",
+                Latitude = animal.Latitude,
+                Longitude = animal.Longitude
             };
 
             return View(viewModel);

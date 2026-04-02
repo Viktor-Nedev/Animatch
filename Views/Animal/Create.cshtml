@@ -1,81 +1,101 @@
-﻿@model Animatch.Models.Animal
-
+@model Animatch.Models.Animal
 
 @{
     ViewData["Title"] = "Добави ново животно";
 }
 
-<h1 class="text-center my-4">Намери приятел на своят домашен любимец!</h1>
-
+<h1 class="text-center my-5 fw-bold text-primary">Намери приятел на своя домашен любимец!</h1>
 
 <div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card shadow">
-            <div class="card-body">
+    <div class="col-md-9">
+        <div class="card shadow-lg border-0" style="border-radius: 15px;">
+            <div class="card-body p-5">
                 <form asp-action="Create" method="post" asp-antiforgery="true">
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-4"></div>
 
-                    <div class="row">
+                    <div class="row g-4">
                         <div class="col-md-6">
                             <div class="form-group mb-3">
-                                <label asp-for="Name" class="control-label">Име</label>
+                                <label asp-for="Name" class="form-label fw-bold">Име</label>
                                 <input asp-for="Name" class="form-control" placeholder="Въведете име..." />
-                                <span asp-validation-for="Name" class="text-danger"></span>
+                                <span asp-validation-for="Name" class="text-danger small"></span>
                             </div>
 
                             <div class="form-group mb-3">
-                                <label asp-for="Species" class="control-label">Вид</label>
+                                <label asp-for="Species" class="form-label fw-bold">Вид</label>
                                 <input asp-for="Species" class="form-control" placeholder="Напр. Куче, Котка..." />
-                                <span asp-validation-for="Species" class="text-danger"></span>
+                                <span asp-validation-for="Species" class="text-danger small"></span>
                             </div>
 
                             <div class="form-group mb-3">
-                                <label asp-for="Breed" class="control-label">Порода</label>
+                                <label asp-for="Breed" class="form-label fw-bold">Порода</label>
                                 <input asp-for="Breed" class="form-control" placeholder="Порода (по избор)..." />
-                                <span asp-validation-for="Breed" class="text-danger"></span>
+                                <span asp-validation-for="Breed" class="text-danger small"></span>
                             </div>
 
                             <div class="form-group mb-3">
-                                <label asp-for="PhoneNumber" class="control-label">Телефон</label>
-                                <input asp-for="PhoneNumber" type="tel" inputmode="numeric" pattern="\\d{10}" maxlength="10" minlength="10" class="form-control" placeholder="0881234567" />
-                                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                <label asp-for="PhoneNumber" class="form-label fw-bold">Телефон</label>
+                                <input asp-for="PhoneNumber" type="tel" class="form-control" placeholder="0881234567" />
+                                <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
                             </div>
 
                             <div class="form-group mb-3">
-                                <label asp-for="CategoryId" class="control-label">Категория</label>
-                                <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.Categories">
+                                <label asp-for="CategoryId" class="form-label fw-bold">Категория</label>
+                                <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.Categories">
                                     <option value="">-- Избери категория --</option>
                                 </select>
-                                <span asp-validation-for="CategoryId" class="text-danger"></span>
+                                <span asp-validation-for="CategoryId" class="text-danger small"></span>
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="form-group mb-3">
-                                <label asp-for="Town" class="control-label">Населено място</label>
+                                <label asp-for="Town" class="form-label fw-bold">Населено място</label>
                                 <input asp-for="Town" class="form-control" placeholder="Град..." />
-                                <span asp-validation-for="Town" class="text-danger"></span>
+                                <span asp-validation-for="Town" class="text-danger small"></span>
                             </div>
 
                             <div class="form-group mb-3">
-                                <label asp-for="ImageUrl" class="control-label">Снимка (URL)</label>
+                                <label asp-for="ImageUrl" class="form-label fw-bold">Снимка (URL)</label>
                                 <input asp-for="ImageUrl" type="url" class="form-control" placeholder="https://..." />
-                                <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                                <span asp-validation-for="ImageUrl" class="text-danger small"></span>
                             </div>
 
                             <div class="form-group mb-3">
-                                <label asp-for="Description" class="control-label">Описание</label>
+                                <label asp-for="Description" class="form-label fw-bold">Описание</label>
                                 <textarea asp-for="Description" class="form-control" rows="8" placeholder="Разкажете малко повече за животното..."></textarea>
-                                <span asp-validation-for="Description" class="text-danger"></span>
+                                <span asp-validation-for="Description" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-12 mt-4">
+                            <div class="p-3 bg-light rounded-3 border">
+                                <h6 class="fw-bold mb-3"><i class="fas fa-map-marker-alt text-danger me-2"></i> Локация (незадължително)</h6>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label asp-for="Latitude" class="form-label small text-muted">Географска ширина (Lat)</label>
+                                            <input asp-for="Latitude" class="form-control" placeholder="Напр: 42.73" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label asp-for="Longitude" class="form-label small text-muted">Географска дължина (Lng)</label>
+                                            <input asp-for="Longitude" class="form-control" placeholder="Напр: 25.48" />
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="form-group mt-4 text-center">
-                        <button type="submit" class="btn btn-success px-5">
-                            <i class="bi bi-save"></i> Запази
+                    <div class="form-group mt-5 d-flex gap-3 justify-content-center">
+                        <button type="submit" class="btn btn-success btn-lg px-5 shadow-sm">
+                            <i class="fas fa-save me-2"></i> Запази обявата
                         </button>
-                        <a asp-action="Index" class="btn btn-secondary px-4 ms-2">← Назад</a>
+                        <a asp-action="Index" class="btn btn-outline-secondary btn-lg px-4">
+                            Назад
+                        </a>
                     </div>
                 </form>
             </div>

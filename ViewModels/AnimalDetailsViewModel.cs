@@ -1,4 +1,4 @@
-﻿namespace Animatch.ViewModels.Animal
+namespace Animatch.ViewModels
 {
     public class AnimalDetailsViewModel
     {
@@ -11,5 +11,7 @@
         public string PhoneNumber { get; set; } = null!;
         public string? ImageUrl { get; set; }
         public string CategoryName { get; set; } = null!;
+        public double? Latitude { get; set; }
+        public double? Longitude { get; set; }
     }
 }

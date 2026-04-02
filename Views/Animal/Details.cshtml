@@ -1,4 +1,4 @@
-﻿@model Animatch.ViewModels.Animal.AnimalDetailsViewModel
+@model Animatch.ViewModels.AnimalDetailsViewModel
 
 @{
     ViewData["Title"] = $"{Model.Name} - Детайли";
@@ -8,9 +8,8 @@
     <div class="row justify-content-center">
         <div class="col-md-10 col-lg-8">
             <div class="card shadow-lg border-0 overflow-hidden">
-                @* Hero Header *@
                 <div class="card-header bg-success text-white py-4 position-relative" 
-                     style="background: linear-gradient(135deg, var(--primary-green), var(--secondary-green)) !important;">
+                     style="background: linear-gradient(135deg, #198754, #20c997) !important;">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h1 class="display-5 fw-bold mb-0">@Model.Name</h1>
@@ -28,7 +27,7 @@
                     @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
                     {
                         <div class="mb-4">
-                            <img src="@Model.ImageUrl" class="animal-details__image" alt="Снимка на @Model.Name" />
+                            <img src="@Model.ImageUrl" class="animal-details__image rounded" style="width: 100%; object-fit: cover; max-height: 400px;" alt="Снимка на @Model.Name" />
                         </div>
                     }
 
@@ -49,9 +48,7 @@
                                 <p class="fs-5 mb-0">@(Model.Breed ?? "Смесена/Неизвестна")</p>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="row g-4 mb-5">
                         <div class="col-sm-6">
                             <div class="p-3 border-start border-4 border-success bg-light rounded-end h-100">
                                 <h5 class="text-success fw-bold mb-2">
@@ -60,6 +57,19 @@
                                 <p class="fs-5 mb-0">@Model.PhoneNumber</p>
                             </div>
                         </div>
+
+                        @if (Model.Latitude.HasValue && Model.Longitude.HasValue)
+                        {
+                            <div class="col-sm-6">
+                                <div class="p-3 border-start border-4 border-warning bg-light rounded-end h-100">
+                                    <h5 class="text-warning fw-bold mb-2">
+                                        <i class="bi bi-pin-map-fill me-2"></i> Кординати
+                                    </h5>
+                                    <p class="fs-6 mb-0">Lat: @Model.Latitude, Lng: @Model.Longitude</p>
+                                    <a asp-action="Map" class="small text-decoration-none">Виж на картата</a>
+                                </div>
+                            </div>
+                        }
                     </div>
 
                     <div class="mb-5">

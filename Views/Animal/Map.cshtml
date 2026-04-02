@@ -1,0 +1,106 @@
+@model IEnumerable<Animatch.Models.Animal>
+@{
+    ViewData["Title"] = "Карта на животните";
+}
+
+<div class="container mt-4">
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h1 class="display-4 fw-bold text-primary mb-3">
+                <i class="fas fa-map-marked-alt text-warning me-2"></i> Карта на нашите приятели
+            </h1>
+            <p class="lead text-muted">Вижте къде се намират животните, които търсят своя нов дом!</p>
+        </div>
+    </div>
+    
+    <div class="card shadow-lg border-0" style="border-radius: 20px; overflow: hidden;">
+        <div class="card-body p-0">
+            <div id="map" style="width: 100%; height: 600px;"></div>
+        </div>
+    </div>
+
+    <div class="mt-4 text-center">
+        <a asp-action="Index" class="btn btn-outline-secondary px-5 py-3 rounded-pill shadow-sm">
+            <i class="fas fa-arrow-left me-2"></i> Обратно към списъка
+        </a>
+    </div>
+</div>
+
+@section Scripts {
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+    
+    <style>
+        .mapboxgl-popup-content {
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .mapboxgl-popup-close-button {
+            padding: 5px;
+            line-height: normal;
+        }
+    </style>
+
+    <script>
+        const mapboxKey = '@ViewBag.MapboxKey';
+        
+        if (!mapboxKey || mapboxKey === '') {
+            console.error('Mapbox key is missing!');
+            document.getElementById('map').innerHTML = '<div class="alert alert-danger m-5">Mapbox API ключът липсва. Проверете .env файла.</div>';
+        } else {
+            mapboxgl.accessToken = mapboxKey;
+            
+            const map = new mapboxgl.Map({
+                container: 'map',
+                style: 'mapbox://styles/mapbox/streets-v12',
+                center: [25.4858, 42.7339],
+                zoom: 6.5
+            });
+
+            
+            map.addControl(new mapboxgl.NavigationControl());
+
+            const animals = @Html.Raw(Json.Serialize(Model.Select(a => new { 
+                name = a.Name, 
+                lat = a.Latitude, 
+                lng = a.Longitude,
+                id = a.Id,
+                species = a.Species
+            })));
+
+            const bounds = new mapboxgl.LngLatBounds();
+            let hasCoordinates = false;
+
+            animals.forEach(animal => {
+                if (animal.lat != null && animal.lng != null) {
+                    hasCoordinates = true;
+                    
+                    const popupHTML = `
+                        <div class="text-center">
+                            <h6 class="fw-bold mb-1">${animal.name}</h6>
+                            <p class="small text-muted mb-2">${animal.species}</p>
+                            <a href="/Animal/Details/${animal.id}" class="btn btn-sm btn-primary w-100 rounded-pill">Детайли</a>
+                        </div>
+                    `;
+
+                    const popup = new mapboxgl.Popup({ offset: 25 })
+                        .setHTML(popupHTML);
+
+                    new mapboxgl.Marker({ color: '#ffc107' })
+                        .setLngLat([animal.lng, animal.lat])
+                        .setPopup(popup)
+                        .addTo(map);
+
+                    bounds.extend([animal.lng, animal.lat]);
+                }
+            });
+
+          
+            if (hasCoordinates) {
+                map.fitBounds(bounds, { padding: 100, maxZoom: 14 });
+            }
+        }
+    </script>
+}

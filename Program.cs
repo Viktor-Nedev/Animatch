@@ -7,9 +7,20 @@ namespace Animatch
 {
 	public class Program
 	{
+
 		public static void Main(string[] args)
 		{
+			if (File.Exists(".env"))
+			{
+				foreach (var line in File.ReadAllLines(".env"))
+				{
+					var parts = line.Split('=', 2);
+					if (parts.Length == 2) Environment.SetEnvironmentVariable(parts[0], parts[1]);
+				}
+			}
+
 			WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+			builder.Configuration.AddEnvironmentVariables();
 
 			string connectionString = builder.Configuration.GetConnectionString("ConnectionToSQLServer") ?? throw new InvalidOperationException("Connection string 'ConnectionToSQLServer' not found.");
 
