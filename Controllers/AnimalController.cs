@@ -41,6 +41,7 @@ namespace Animatch.Controllers
             return View(animals);
         }
 
+
         [HttpGet]
         public IActionResult Map()
         {
@@ -50,6 +51,26 @@ namespace Animatch.Controllers
 
             ViewBag.MapboxKey = configuration["MAPBOX_KEY"];
             return View(animals);
+        }
+
+        [HttpGet]
+        [Authorize]
+        public IActionResult Profile()
+        {
+            var userId = GetUserId();
+            var myAnimals = context.Animals
+                .Where(a => a.OwnerId == userId)
+                .Include(a => a.Category)
+                .ToList();
+
+            var viewModel = new Animatch.ViewModels.ProfileViewModel
+            {
+                Username = User.Identity?.Name ?? "Потребител",
+                Email = User.FindFirstValue(ClaimTypes.Email) ?? "Няма имейл",
+                MyAnimals = myAnimals
+            };
+
+            return View(viewModel);
         }
 
         [HttpGet]

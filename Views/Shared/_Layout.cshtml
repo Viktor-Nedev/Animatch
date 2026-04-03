@@ -39,6 +39,14 @@
                                     <i class="fas fa-map-marked-alt text-warning me-1"></i> Карта
                                 </a>
                             </li>
+                            @if (User.Identity?.IsAuthenticated == true)
+                            {
+                                <li class="nav-item ms-2">
+                                    <a class="nav-link text-dark fw-bold fs-5 px-3 py-2 rounded-pill hover-effect bg-light" asp-area="" asp-controller="Animal" asp-action="Profile">
+                                        <i class="fas fa-user-circle text-primary me-1"></i> Профил
+                                    </a>
+                                </li>
+                            }
                         </ul>
                         <partial name="_LoginPartial" />
                     </div>
