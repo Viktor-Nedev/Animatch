@@ -1,14 +1,15 @@
 using Animatch.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Animatch
 {
 	public class Program
 	{
 
-		public static void Main(string[] args)
+		public static async Task Main(string[] args)
 		{
 			if (File.Exists(".env"))
 			{
@@ -28,15 +29,30 @@ namespace Animatch
 				options.UseSqlServer(connectionString));
 			builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-			builder.Services.AddDefaultIdentity<IdentityUser>(options => {
+            builder.Services.AddDefaultIdentity<IdentityUser>(options => {
 
-				ConfigyIdentityOptions(options, builder.Configuration);
+                ConfigyIdentityOptions(options, builder.Configuration);
 
             })
-				.AddEntityFrameworkStores<AnimalManagerDbContext>();
-			builder.Services.AddControllersWithViews();
+                .AddRoles<IdentityRole>()
+                .AddEntityFrameworkStores<AnimalManagerDbContext>();
+            builder.Services.AddControllersWithViews();
 
 			WebApplication app = builder.Build();
+
+			using (var scope = app.Services.CreateScope())
+			{
+				var services = scope.ServiceProvider;
+				try
+				{
+					await SeedData.InitializeAsync(services, builder.Configuration);
+				}
+				catch (Exception ex)
+				{
+					var logger = services.GetRequiredService<ILogger<Program>>();
+					logger.LogError(ex, "An error occurred while seeding roles and admin user.");
+				}
+			}
 
 			// Configure the HTTP request pipeline.
 			if (app.Environment.IsDevelopment())
@@ -62,7 +78,7 @@ namespace Animatch
 				pattern: "{controller=Home}/{action=Index}/{id?}");
 			app.MapRazorPages();
 
-			app.Run();
+			await app.RunAsync();
 		}
 
 

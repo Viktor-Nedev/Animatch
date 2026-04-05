@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
 
 namespace Animatch.Controllers
 {
@@ -12,11 +13,13 @@ namespace Animatch.Controllers
     {
         private readonly AnimalManagerDbContext context;
         private readonly IConfiguration configuration;
+        private readonly UserManager<IdentityUser> userManager;
 
-        public AnimalController(AnimalManagerDbContext context, IConfiguration configuration)
+        public AnimalController(AnimalManagerDbContext context, IConfiguration configuration, UserManager<IdentityUser> userManager)
         {
             this.context = context;
             this.configuration = configuration;
+            this.userManager = userManager;
         }
 
         [HttpGet]
@@ -55,7 +58,7 @@ namespace Animatch.Controllers
 
         [HttpGet]
         [Authorize]
-        public IActionResult Profile()
+        public async Task<IActionResult> Profile()
         {
             var userId = GetUserId();
             var myAnimals = context.Animals
@@ -63,10 +66,17 @@ namespace Animatch.Controllers
                 .Include(a => a.Category)
                 .ToList();
 
+            var currentUser = await userManager.GetUserAsync(User);
+            var roles = currentUser != null
+                ? await userManager.GetRolesAsync(currentUser)
+                : new List<string>();
+            var roleName = roles.FirstOrDefault() ?? "User";
+
             var viewModel = new Animatch.ViewModels.ProfileViewModel
             {
                 Username = User.Identity?.Name ?? "Потребител",
                 Email = User.FindFirstValue(ClaimTypes.Email) ?? "Няма имейл",
+                Role = roleName,
                 MyAnimals = myAnimals
             };
 

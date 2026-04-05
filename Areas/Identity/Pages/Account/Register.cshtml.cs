@@ -13,6 +13,7 @@ namespace Animatch.Areas.Identity.Pages.Account
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.RazorPages;
     using Microsoft.AspNetCore.WebUtilities;
+    using Microsoft.EntityFrameworkCore;
 
     public class RegisterModel : PageModel
     {
@@ -20,17 +21,20 @@ namespace Animatch.Areas.Identity.Pages.Account
         private readonly UserManager<IdentityUser> userManager;
         private readonly IUserStore<IdentityUser> userStore;
         private readonly IUserEmailStore<IdentityUser> emailStore;
+        private readonly RoleManager<IdentityRole> roleManager;
 
 
         public RegisterModel(
             UserManager<IdentityUser> userManager,
             IUserStore<IdentityUser> userStore,
-            SignInManager<IdentityUser> signInManager)
+            SignInManager<IdentityUser> signInManager,
+            RoleManager<IdentityRole> roleManager)
         {
             this.userManager = userManager;
             this.userStore = userStore;
             this.emailStore = GetEmailStore();
             this.signInManager = signInManager;
+            this.roleManager = roleManager;
         }
 
         /// <summary>
@@ -51,6 +55,8 @@ namespace Animatch.Areas.Identity.Pages.Account
         ///     directly from your code. This API may change or be removed in future releases.
         /// </summary>
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
+
+        public IList<string> AvailableRoles { get; set; } = new List<string>();
 
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -94,6 +100,10 @@ namespace Animatch.Areas.Identity.Pages.Account
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; } 
+
+            [Required]
+            [Display(Name = "Role")]
+            public string Role { get; set; } = "User";
         }
 
 
@@ -101,12 +111,26 @@ namespace Animatch.Areas.Identity.Pages.Account
         {
             ReturnUrl = returnUrl ?? Url.Content("~/Animal");
             ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+            AvailableRoles = await roleManager.Roles
+                .Select(r => r.Name!)
+                .OrderBy(r => r)
+                .ToListAsync();
         }
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
             returnUrl ??= Url.Content("~/Animal");
             ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+            AvailableRoles = await roleManager.Roles
+                .Select(r => r.Name!)
+                .OrderBy(r => r)
+                .ToListAsync();
+
+            if (!AvailableRoles.Contains(Input.Role))
+            {
+                ModelState.AddModelError(nameof(Input.Role), "Невалидна роля.");
+            }
+
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
@@ -117,6 +141,7 @@ namespace Animatch.Areas.Identity.Pages.Account
 
                 if (result.Succeeded)
                 {
+                    await userManager.AddToRoleAsync(user, Input.Role);
               
 
                     var userId = await userManager.GetUserIdAsync(user);
