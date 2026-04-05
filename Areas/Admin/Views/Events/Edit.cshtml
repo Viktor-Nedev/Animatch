@@ -1,0 +1,55 @@
+@model Animatch.Models.Event
+@{
+    ViewData["Title"] = "Редакция на събитие";
+}
+
+<link rel="stylesheet" href="~/css/admin-events.css" asp-append-version="true" />
+
+<div class="container event-admin-shell">
+    <section class="event-admin-hero">
+        <h2>Редакция на събитие</h2>
+        <p>Обнови информацията за инициативата и поддържай събитията актуални.</p>
+    </section>
+
+    <div class="event-form-card">
+        <form asp-area="Admin" asp-controller="Events" asp-action="Edit" method="post" novalidate>
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+            <input type="hidden" asp-for="Id" />
+
+            <div class="event-form-grid">
+                <div class="event-form-full">
+                    <label asp-for="Title" class="event-form-label">Заглавие</label>
+                    <input asp-for="Title" class="form-control" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+
+                <div>
+                    <label asp-for="Date" class="event-form-label">Дата и час</label>
+                    <input asp-for="Date" type="datetime-local" class="form-control" value='@Model.Date.ToString("yyyy-MM-ddTHH:mm")' />
+                    <span asp-validation-for="Date" class="text-danger"></span>
+                </div>
+
+                <div>
+                    <label asp-for="Location" class="event-form-label">Локация</label>
+                    <input asp-for="Location" class="form-control" />
+                    <span asp-validation-for="Location" class="text-danger"></span>
+                </div>
+
+                <div class="event-form-full">
+                    <label asp-for="Description" class="event-form-label">Описание</label>
+                    <textarea asp-for="Description" class="form-control" rows="6"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="event-admin-actions">
+                <button type="submit" class="btn btn-success">Запази промените</button>
+                <a asp-area="Admin" asp-controller="Events" asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Назад</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

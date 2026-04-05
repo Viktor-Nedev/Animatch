@@ -1,0 +1,42 @@
+@model Animatch.Models.Event
+@{
+    ViewData["Title"] = "Детайли за събитие";
+}
+
+<link rel="stylesheet" href="~/css/admin-events.css" asp-append-version="true" />
+
+<div class="container event-admin-shell">
+    <section class="event-admin-hero">
+        <h2>Детайли за събитие</h2>
+        <p>Преглед на съдържанието и основната информация за инициативата.</p>
+    </section>
+
+    <article class="event-detail-card">
+        <header class="event-detail-header">
+            <h3 class="event-detail-title">@Model.Title</h3>
+            <span class="event-card__date">
+                <i class="far fa-clock"></i>
+                @Model.Date.ToString("dd.MM.yyyy HH:mm")
+            </span>
+        </header>
+
+        <div class="event-meta">
+            <div class="event-meta-item">
+                <span class="event-meta-label">Локация</span>
+                <span class="event-meta-value">@Model.Location</span>
+            </div>
+            <div class="event-meta-item">
+                <span class="event-meta-label">Създател</span>
+                <span class="event-meta-value">@Model.CreatedById</span>
+            </div>
+        </div>
+
+        <div class="event-description">@Model.Description</div>
+
+        <div class="event-admin-actions">
+            <a asp-area="Admin" asp-controller="Events" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Редакция</a>
+            <a asp-area="Admin" asp-controller="Events" asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger">Изтриване</a>
+            <a asp-area="Admin" asp-controller="Events" asp-action="Index" class="btn btn-outline-secondary">Назад</a>
+        </div>
+    </article>
+</div>
