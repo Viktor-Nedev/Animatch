@@ -1,0 +1,16 @@
+@model Animatch.Models.Category
+@{
+    ViewData["Title"] = "Изтриване на категория";
+}
+
+<div class="container mt-4">
+    <h2>@ViewData["Title"]</h2>
+    <div class="alert alert-warning">
+        Сигурни ли сте, че искате да изтриете категорията <strong>@Model.Name</strong>?
+    </div>
+    <form asp-action="Delete" method="post">
+        <input type="hidden" asp-for="Id" />
+        <button type="submit" class="btn btn-danger">Изтрий</button>
+        <a asp-action="Index" class="btn btn-secondary ms-2">Отказ</a>
+    </form>
+</div>
