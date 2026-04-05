@@ -68,6 +68,7 @@ namespace Animatch.Models
 		[ForeignKey(nameof(Category))]
 		public int CategoryId { get; set; }
 		public virtual Category? Category { get; set; }
+		public virtual ICollection<WalkRequest> WalkRequests { get; set; } = new List<WalkRequest>();
 
 		
 
