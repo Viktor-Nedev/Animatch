@@ -13,14 +13,46 @@ namespace Animatch.Services
             this.context = context;
         }
 
-        public async Task<IEnumerable<Animal>> GetAllAsync()
+        public async Task<IEnumerable<Animal>> GetAllWithCategoryAsync()
         {
             return await context.Animals.Include(a => a.Category).AsNoTracking().ToListAsync();
         }
 
-        public async Task<Animal?> GetByIdAsync(int id)
+        public async Task<IEnumerable<Animal>> GetWithCoordinatesAsync()
+        {
+            return await context.Animals
+                .Where(a => a.Latitude.HasValue && a.Longitude.HasValue)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Animal>> GetByOwnerAsync(string ownerId)
+        {
+            return await context.Animals
+                .Where(a => a.OwnerId == ownerId)
+                .Include(a => a.Category)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<string>> GetDistinctTownsAsync()
+        {
+            return await context.Animals
+                .Select(a => a.Town)
+                .Where(t => !string.IsNullOrWhiteSpace(t))
+                .Select(t => t!)
+                .Distinct()
+                .OrderBy(t => t)
+                .ToListAsync();
+        }
+
+        public async Task<Animal?> GetByIdWithCategoryAsync(int id)
         {
             return await context.Animals.Include(a => a.Category).FirstOrDefaultAsync(a => a.Id == id);
+        }
+
+        public async Task<bool> ExistsAsync(int id)
+        {
+            return await context.Animals.AnyAsync(e => e.Id == id);
         }
 
         public async Task AddAsync(Animal animal)

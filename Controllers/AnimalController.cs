@@ -1,56 +1,45 @@
-using Animatch.Data;
 using Microsoft.AspNetCore.Mvc;
 using Animatch.Models;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
+using Animatch.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace Animatch.Controllers
 {
     public class AnimalController : Controller
     {
-        private readonly AnimalManagerDbContext context;
         private readonly IConfiguration configuration;
         private readonly UserManager<IdentityUser> userManager;
+        private readonly IAnimalService animalService;
+        private readonly ICategoryService categoryService;
 
-        public AnimalController(AnimalManagerDbContext context, IConfiguration configuration, UserManager<IdentityUser> userManager)
+        public AnimalController(IConfiguration configuration, UserManager<IdentityUser> userManager, IAnimalService animalService, ICategoryService categoryService)
         {
-            this.context = context;
             this.configuration = configuration;
             this.userManager = userManager;
+            this.animalService = animalService;
+            this.categoryService = categoryService;
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            IEnumerable<Animal> animals = context
-                .Animals
-                .Include(animal => animal.Category)
-                .AsNoTracking()
-                .OrderBy(a => a.Name)
-                .ToList();
+            var animals = (await animalService.GetAllWithCategoryAsync()).OrderBy(a => a.Name).ToList();
 
-            ViewBag.Categories = context.Categories.ToList() ?? new List<Category>();
-            ViewBag.Towns = animals
-                .Select(a => a.Town)
-                .Where(t => !string.IsNullOrWhiteSpace(t))
-                .Select(t => t!)
-                .Distinct()
-                .OrderBy(t => t)
-                .ToList();
+            ViewBag.Categories = await categoryService.GetAllAsync();
+            ViewBag.Towns = await animalService.GetDistinctTownsAsync();
 
             return View(animals);
         }
 
 
         [HttpGet]
-        public IActionResult Map()
+        public async Task<IActionResult> Map()
         {
-            var animals = context.Animals
-                .Where(a => a.Latitude.HasValue && a.Longitude.HasValue)
-                .ToList();
+            var animals = await animalService.GetWithCoordinatesAsync();
 
             ViewBag.MapboxKey = configuration["MAPBOX_KEY"];
             return View(animals);
@@ -61,10 +50,9 @@ namespace Animatch.Controllers
         public async Task<IActionResult> Profile()
         {
             var userId = GetUserId();
-            var myAnimals = context.Animals
-                .Where(a => a.OwnerId == userId)
-                .Include(a => a.Category)
-                .ToList();
+            var myAnimals = string.IsNullOrEmpty(userId)
+                ? Enumerable.Empty<Animal>()
+                : await animalService.GetByOwnerAsync(userId);
 
             var currentUser = await userManager.GetUserAsync(User);
             var roles = currentUser != null
@@ -85,9 +73,9 @@ namespace Animatch.Controllers
 
         [HttpGet]
         [Authorize]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            var categories = context.Categories.ToList();
+            var categories = await categoryService.GetAllAsync();
             ViewBag.Categories = new SelectList(categories, "Id", "Name");
             return View();
         }
@@ -95,10 +83,10 @@ namespace Animatch.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public IActionResult Create(Animal animal)
+        public async Task<IActionResult> Create(Animal animal)
         {
-            var categoryExists = context.Categories.Any(c => c.Id == animal.CategoryId);
-            if (!categoryExists)
+            var category = await categoryService.GetByIdAsync(animal.CategoryId);
+            if (category == null)
             {
                 ModelState.AddModelError("CategoryId", "Невалидна категория");
             }
@@ -108,14 +96,10 @@ namespace Animatch.Controllers
                 try
                 {
                     animal.OwnerId = GetUserId();
-                    context.Animals.Add(animal);
-                    int result = context.SaveChanges();
+                    await animalService.AddAsync(animal);
 
-                    if (result > 0)
-                    {
-                        TempData["Success"] = "Животното е добавено успешно!";
-                        return RedirectToAction(nameof(Index));
-                    }
+                    TempData["Success"] = "Животното е добавено успешно!";
+                    return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
                 {
@@ -123,23 +107,21 @@ namespace Animatch.Controllers
                 }
             }
 
-            var categories = context.Categories.ToList();
+            var categories = await categoryService.GetAllAsync();
             ViewBag.Categories = new SelectList(categories, "Id", "Name", animal.CategoryId);
             return View(animal);
         }
 
         [HttpGet]
         [Authorize]
-        public IActionResult Edit(int? id)
+        public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var animal = context.Animals
-                .Include(a => a.Category)
-                .FirstOrDefault(a => a.Id == id);
+            var animal = await animalService.GetByIdWithCategoryAsync(id.Value);
 
             if (animal == null)
             {
@@ -151,7 +133,7 @@ namespace Animatch.Controllers
                 return Forbid();
             }
 
-            var categories = context.Categories.ToList();
+            var categories = await categoryService.GetAllAsync();
             ViewBag.Categories = new SelectList(categories, "Id", "Name", animal.CategoryId);
 
             return View(animal);
@@ -160,15 +142,15 @@ namespace Animatch.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public IActionResult Edit(int id, Animal animal)
+        public async Task<IActionResult> Edit(int id, Animal animal)
         {
             if (id != animal.Id)
             {
                 return NotFound();
             }
 
-            var categoryExists = context.Categories.Any(c => c.Id == animal.CategoryId);
-            if (!categoryExists)
+            var category = await categoryService.GetByIdAsync(animal.CategoryId);
+            if (category == null)
             {
                 ModelState.AddModelError("CategoryId", "Невалидна категория");
             }
@@ -177,7 +159,7 @@ namespace Animatch.Controllers
             {
                 try
                 {
-                    var existingAnimal = context.Animals.Find(id);
+                    var existingAnimal = await animalService.GetByIdWithCategoryAsync(id);
                     if (existingAnimal == null)
                     {
                         return NotFound();
@@ -199,18 +181,14 @@ namespace Animatch.Controllers
                     existingAnimal.Latitude = animal.Latitude;
                     existingAnimal.Longitude = animal.Longitude;
 
-                    context.Update(existingAnimal);
-                    int result = context.SaveChanges();
+                    await animalService.UpdateAsync(existingAnimal);
 
-                    if (result > 0)
-                    {
-                        TempData["Success"] = "Животното е редактирано успешно!";
-                        return RedirectToAction(nameof(Index));
-                    }
+                    TempData["Success"] = "Животното е редактирано успешно!";
+                    return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!AnimalExists(animal.Id))
+                    if (!await AnimalExists(animal.Id))
                     {
                         return NotFound();
                     }
@@ -225,23 +203,21 @@ namespace Animatch.Controllers
                 }
             }
 
-            var categories = context.Categories.ToList();
+            var categories = await categoryService.GetAllAsync();
             ViewBag.Categories = new SelectList(categories, "Id", "Name", animal.CategoryId);
             return View(animal);
         }
 
         [HttpGet]
         [Authorize]
-        public IActionResult Delete(int? id)
+        public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var animal = context.Animals
-                .Include(a => a.Category)
-                .FirstOrDefault(a => a.Id == id);
+            var animal = await animalService.GetByIdWithCategoryAsync(id.Value);
 
             if (animal == null)
             {
@@ -259,11 +235,11 @@ namespace Animatch.Controllers
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public IActionResult DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
             try
             {
-                var animal = context.Animals.Find(id);
+                var animal = await animalService.GetByIdWithCategoryAsync(id);
                 if (animal != null)
                 {
                     if (!IsOwner(animal))
@@ -271,13 +247,8 @@ namespace Animatch.Controllers
                         return Forbid();
                     }
 
-                    context.Animals.Remove(animal);
-                    int result = context.SaveChanges();
-
-                    if (result > 0)
-                    {
-                        TempData["Success"] = "Животното е изтрито успешно!";
-                    }
+                    await animalService.DeleteAsync(id);
+                    TempData["Success"] = "Животното е изтрито успешно!";
                 }
                 return RedirectToAction(nameof(Index));
             }
@@ -289,16 +260,14 @@ namespace Animatch.Controllers
         }
 
         [HttpGet]
-        public IActionResult Details(int? id)
+        public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var animal = context.Animals
-                .Include(a => a.Category)
-                .FirstOrDefault(a => a.Id == id);
+            var animal = await animalService.GetByIdWithCategoryAsync(id.Value);
 
             if (animal == null)
             {
@@ -323,9 +292,9 @@ namespace Animatch.Controllers
             return View(viewModel);
         }
 
-        private bool AnimalExists(int id)
+        private async Task<bool> AnimalExists(int id)
         {
-            return context.Animals.Any(e => e.Id == id);
+            return await animalService.ExistsAsync(id);
         }
 
         private string? GetUserId()

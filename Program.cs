@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Animatch.Services;
 
 namespace Animatch
 {
@@ -29,14 +30,18 @@ namespace Animatch
 				options.UseSqlServer(connectionString));
 			builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-            builder.Services.AddDefaultIdentity<IdentityUser>(options => {
+			builder.Services.AddDefaultIdentity<IdentityUser>(options => {
 
-                ConfigyIdentityOptions(options, builder.Configuration);
+				ConfigyIdentityOptions(options, builder.Configuration);
 
             })
-                .AddRoles<IdentityRole>()
-                .AddEntityFrameworkStores<AnimalManagerDbContext>();
-            builder.Services.AddControllersWithViews();
+				.AddRoles<IdentityRole>()
+				.AddEntityFrameworkStores<AnimalManagerDbContext>();
+			builder.Services.AddControllersWithViews();
+			builder.Services.AddScoped<IAnimalService, AnimalService>();
+			builder.Services.AddScoped<ICategoryService, CategoryService>();
+			builder.Services.AddScoped<IEventService, EventService>();
+			builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 			WebApplication app = builder.Build();
 
