@@ -25,14 +25,29 @@ namespace Animatch.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? searchTerm, int? categoryId, string? town, int page = 1, int pageSize = 9)
         {
-            var animals = (await animalService.GetAllWithCategoryAsync()).OrderBy(a => a.Name).ToList();
+            page = page < 1 ? 1 : page;
+            pageSize = pageSize is < 3 or > 24 ? 9 : pageSize;
 
-            ViewBag.Categories = await categoryService.GetAllAsync();
-            ViewBag.Towns = await animalService.GetDistinctTownsAsync();
+            var (animals, totalCount) = await animalService.GetPagedFilteredAsync(searchTerm, categoryId, town, page, pageSize);
+            var categories = (await categoryService.GetAllAsync()).OrderBy(c => c.Name).ToList();
+            var towns = await animalService.GetDistinctTownsAsync();
 
-            return View(animals);
+            var model = new Animatch.ViewModels.AnimalIndexQueryViewModel
+            {
+                SearchTerm = searchTerm,
+                CategoryId = categoryId,
+                Town = town,
+                Page = page,
+                PageSize = pageSize,
+                TotalCount = totalCount,
+                Animals = animals,
+                Categories = categories,
+                Towns = towns
+            };
+
+            return View(model);
         }
 
 

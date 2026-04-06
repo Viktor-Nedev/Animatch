@@ -18,12 +18,24 @@ namespace Animatch.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? searchTerm, string? location, int page = 1, int pageSize = 6)
         {
-            var events = (await eventService.GetAllAsync())
-                .OrderByDescending(e => e.Date)
-                .ToList();
-            return View(events);
+            page = page < 1 ? 1 : page;
+            pageSize = pageSize is < 3 or > 24 ? 6 : pageSize;
+
+            var (events, totalCount) = await eventService.GetPagedAsync(searchTerm, location, page, pageSize);
+
+            var model = new Animatch.ViewModels.EventIndexQueryViewModel
+            {
+                SearchTerm = searchTerm,
+                Location = location,
+                Page = page,
+                PageSize = pageSize,
+                TotalCount = totalCount,
+                Events = events
+            };
+
+            return View(model);
         }
 
         [HttpGet]

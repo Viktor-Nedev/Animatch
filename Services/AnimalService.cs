@@ -18,6 +18,41 @@ namespace Animatch.Services
             return await context.Animals.Include(a => a.Category).AsNoTracking().ToListAsync();
         }
 
+        public async Task<(IEnumerable<Animal> Items, int TotalCount)> GetPagedFilteredAsync(string? searchTerm, int? categoryId, string? town, int page, int pageSize)
+        {
+            var query = context.Animals
+                .Include(a => a.Category)
+                .AsNoTracking()
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                var normalized = searchTerm.Trim().ToLower();
+                query = query.Where(a => a.Name.ToLower().Contains(normalized));
+            }
+
+            if (categoryId.HasValue)
+            {
+                query = query.Where(a => a.CategoryId == categoryId.Value);
+            }
+
+            if (!string.IsNullOrWhiteSpace(town))
+            {
+                var normalizedTown = town.Trim().ToLower();
+                query = query.Where(a => a.Town != null && a.Town.ToLower() == normalizedTown);
+            }
+
+            var totalCount = await query.CountAsync();
+
+            var items = await query
+                .OrderBy(a => a.Name)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (items, totalCount);
+        }
+
         public async Task<IEnumerable<Animal>> GetWithCoordinatesAsync()
         {
             return await context.Animals
