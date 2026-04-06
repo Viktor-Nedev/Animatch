@@ -11,7 +11,7 @@ namespace Animatch.ViewModels
         public string AnimalTown { get; set; } = string.Empty;
         public string AnimalCategory { get; set; } = string.Empty;
 
-        [MaxLength(500)]
+        [StringLength(500, MinimumLength = 5)]
         public string? Message { get; set; }
     }
 }

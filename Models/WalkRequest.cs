@@ -21,9 +21,11 @@ namespace Animatch.Models
         [Required]
         public RequestStatus Status { get; set; } = RequestStatus.Pending;
 
-        [MaxLength(500)]
+        [StringLength(500, MinimumLength = 5)]
         public string? Message { get; set; }
 
+        [Required]
+        [DataType(DataType.DateTime)]
         public DateTime RequestedOn { get; set; } = DateTime.UtcNow;
     }
 }

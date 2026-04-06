@@ -1,5 +1,6 @@
 using Animatch.Data;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -37,7 +38,10 @@ namespace Animatch
             })
 				.AddRoles<IdentityRole>()
 				.AddEntityFrameworkStores<AnimalManagerDbContext>();
-			builder.Services.AddControllersWithViews();
+			builder.Services.AddControllersWithViews(options =>
+			{
+				options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+			});
 			builder.Services.AddScoped<IAnimalService, AnimalService>();
 			builder.Services.AddScoped<ICategoryService, CategoryService>();
 			builder.Services.AddScoped<IEventService, EventService>();

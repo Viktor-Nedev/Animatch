@@ -48,7 +48,11 @@
         
         if (!mapboxKey || mapboxKey === '') {
             console.error('Mapbox key is missing!');
-            document.getElementById('map').innerHTML = '<div class="alert alert-danger m-5">Mapbox API ключът липсва. Проверете .env файла.</div>';
+            const mapContainer = document.getElementById('map');
+            const warning = document.createElement('div');
+            warning.className = 'alert alert-danger m-5';
+            warning.textContent = 'Mapbox API ключът липсва. Проверете .env файла.';
+            mapContainer.appendChild(warning);
         } else {
             mapboxgl.accessToken = mapboxKey;
             
@@ -72,21 +76,35 @@
 
             const bounds = new mapboxgl.LngLatBounds();
             let hasCoordinates = false;
+            const createPopupContent = (animal) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'text-center';
+
+                const title = document.createElement('h6');
+                title.className = 'fw-bold mb-1';
+                title.textContent = animal.name ?? '';
+
+                const species = document.createElement('p');
+                species.className = 'small text-muted mb-2';
+                species.textContent = animal.species ?? '';
+
+                const detailsLink = document.createElement('a');
+                detailsLink.className = 'btn btn-sm btn-primary w-100 rounded-pill';
+                detailsLink.href = `/Animal/Details/${animal.id}`;
+                detailsLink.textContent = 'Детайли';
+
+                wrapper.appendChild(title);
+                wrapper.appendChild(species);
+                wrapper.appendChild(detailsLink);
+                return wrapper;
+            };
 
             animals.forEach(animal => {
                 if (animal.lat != null && animal.lng != null) {
                     hasCoordinates = true;
-                    
-                    const popupHTML = `
-                        <div class="text-center">
-                            <h6 class="fw-bold mb-1">${animal.name}</h6>
-                            <p class="small text-muted mb-2">${animal.species}</p>
-                            <a href="/Animal/Details/${animal.id}" class="btn btn-sm btn-primary w-100 rounded-pill">Детайли</a>
-                        </div>
-                    `;
 
                     const popup = new mapboxgl.Popup({ offset: 25 })
-                        .setHTML(popupHTML);
+                        .setDOMContent(createPopupContent(animal));
 
                     new mapboxgl.Marker({ color: '#ffc107' })
                         .setLngLat([animal.lng, animal.lat])

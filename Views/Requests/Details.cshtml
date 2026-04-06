@@ -49,11 +49,11 @@
             <div class="d-flex flex-wrap gap-2">
                 @if (canManage && Model.Status == Animatch.Models.RequestStatus.Pending)
                 {
-                    <form asp-action="Approve" method="post">
+                    <form asp-action="Approve" method="post" asp-antiforgery="true">
                         <input type="hidden" name="id" value="@Model.Id" />
                         <button type="submit" class="btn btn-success">Одобри</button>
                     </form>
-                    <form asp-action="Reject" method="post">
+                    <form asp-action="Reject" method="post" asp-antiforgery="true">
                         <input type="hidden" name="id" value="@Model.Id" />
                         <button type="submit" class="btn btn-danger">Отхвърли</button>
                     </form>

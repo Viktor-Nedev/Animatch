@@ -72,7 +72,7 @@
                         </div>
                     </div>
 
-                    <form asp-action="Delete" class="mt-4">
+                    <form asp-action="Delete" method="post" asp-antiforgery="true" class="mt-4">
                         <input type="hidden" asp-for="Id" />
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                             <button type="submit" class="btn btn-danger btn-lg px-5">
