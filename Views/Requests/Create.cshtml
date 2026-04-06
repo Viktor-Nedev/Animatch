@@ -1,0 +1,39 @@
+@model Animatch.ViewModels.WalkRequestCreateViewModel
+@{
+    ViewData["Title"] = "Нова заявка за разходка";
+}
+
+<div class="container mt-4">
+    <div class="card border-0 shadow-lg">
+        <div class="card-header bg-success text-white py-3">
+            <h3 class="mb-0">Нова заявка за разходка</h3>
+        </div>
+        <div class="card-body p-4">
+            <div class="mb-4 p-3 bg-light rounded-3">
+                <h5 class="mb-2">@Model.AnimalName</h5>
+                <div class="text-muted">Категория: @Model.AnimalCategory</div>
+                <div class="text-muted">Град: @Model.AnimalTown</div>
+            </div>
+
+            <form asp-action="Create" method="post">
+                <input type="hidden" asp-for="AnimalId" />
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Message" class="form-label fw-semibold">Съобщение</label>
+                    <textarea asp-for="Message" class="form-control" rows="5" placeholder="Напиши кратко представяне и кога можеш да помогнеш."></textarea>
+                    <span asp-validation-for="Message" class="text-danger"></span>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-success">Изпрати заявка</button>
+                    <a asp-controller="Animal" asp-action="Details" asp-route-id="@Model.AnimalId" class="btn btn-outline-secondary">Назад</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

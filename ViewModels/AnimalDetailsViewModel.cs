@@ -10,6 +10,7 @@ namespace Animatch.ViewModels
         public string Description { get; set; } = null!;
         public string PhoneNumber { get; set; } = null!;
         public string? ImageUrl { get; set; }
+        public string? OwnerId { get; set; }
         public string CategoryName { get; set; } = null!;
         public double? Latitude { get; set; }
         public double? Longitude { get; set; }

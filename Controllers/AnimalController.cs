@@ -284,6 +284,7 @@ namespace Animatch.Controllers
                 Description = animal.Description,
                 PhoneNumber = animal.PhoneNumber,
                 ImageUrl = animal.ImageUrl,
+                OwnerId = animal.OwnerId,
                 CategoryName = animal.Category?.Name ?? "Няма категория",
                 Latitude = animal.Latitude,
                 Longitude = animal.Longitude

@@ -50,6 +50,11 @@
                             @if (User.Identity?.IsAuthenticated == true)
                             {
                                 <li class="nav-item ms-2">
+                                    <a class="nav-link text-dark fw-bold fs-5 px-3 py-2 rounded-pill hover-effect bg-light" asp-area="" asp-controller="Requests" asp-action="MyRequests">
+                                        <i class="fas fa-clipboard-list text-success me-1"></i> Заявки
+                                    </a>
+                                </li>
+                                <li class="nav-item ms-2">
                                     <a class="nav-link text-dark fw-bold fs-5 px-3 py-2 rounded-pill hover-effect bg-light" asp-area="" asp-controller="Animal" asp-action="Profile">
                                         <i class="fas fa-user-circle text-primary me-1"></i> Профил
                                     </a>

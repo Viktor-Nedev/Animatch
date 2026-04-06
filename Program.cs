@@ -41,6 +41,7 @@ namespace Animatch
 			builder.Services.AddScoped<IAnimalService, AnimalService>();
 			builder.Services.AddScoped<ICategoryService, CategoryService>();
 			builder.Services.AddScoped<IEventService, EventService>();
+			builder.Services.AddScoped<IWalkRequestService, WalkRequestService>();
 			builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 			WebApplication app = builder.Build();
