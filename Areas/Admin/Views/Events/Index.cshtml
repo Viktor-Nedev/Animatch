@@ -61,6 +61,7 @@
         </div>
         <div class="event-admin-actions">
             <button type="submit" class="btn btn-success">Филтрирай</button>
+            <button type="button" id="loadEventsApiBtn" class="btn btn-outline-primary">Филтрирай (AJAX)</button>
             <a asp-area="Admin" asp-controller="Events" asp-action="Index" class="btn btn-outline-secondary">Изчисти</a>
         </div>
     </form>
@@ -70,17 +71,19 @@
         <div class="alert alert-success mt-3 mb-0">@TempData["Success"]</div>
     }
 
-    @if (!Model.Events.Any())
-    {
-        <div class="event-form-card text-center">
-            <h4 class="mb-2">Няма събития за избраните филтри</h4>
-            <p class="text-muted mb-3">Промени филтрите или създай нова инициатива.</p>
-            <a asp-area="Admin" asp-controller="Events" asp-action="Create" class="btn btn-success">Създай събитие</a>
-        </div>
-    }
-    else
-    {
-        <div class="row g-3 event-card-grid">
+    <div id="eventsGrid" class="row g-3 event-card-grid">
+        @if (!Model.Events.Any())
+        {
+            <div class="col-12">
+                <div class="event-form-card text-center">
+                    <h4 class="mb-2">Няма събития за избраните филтри</h4>
+                    <p class="text-muted mb-3">Промени филтрите или създай нова инициатива.</p>
+                    <a asp-area="Admin" asp-controller="Events" asp-action="Create" class="btn btn-success">Създай събитие</a>
+                </div>
+            </div>
+        }
+        else
+        {
             @foreach (var ev in Model.Events)
             {
                 <div class="col-xl-4 col-md-6">
@@ -104,47 +107,168 @@
                     </article>
                 </div>
             }
-        </div>
-
-        @if (Model.TotalPages > 1)
-        {
-            <nav aria-label="Events pagination" class="mt-4">
-                <ul class="pagination justify-content-center">
-                    <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
-                        <a class="page-link"
-                           asp-area="Admin"
-                           asp-controller="Events"
-                           asp-action="Index"
-                           asp-route-searchTerm="@Model.SearchTerm"
-                           asp-route-location="@Model.Location"
-                           asp-route-page="@(Model.Page - 1)"
-                           asp-route-pageSize="@Model.PageSize">Назад</a>
-                    </li>
-                    @for (var i = 1; i <= Model.TotalPages; i++)
-                    {
-                        <li class="page-item @(Model.Page == i ? "active" : "")">
-                            <a class="page-link"
-                               asp-area="Admin"
-                               asp-controller="Events"
-                               asp-action="Index"
-                               asp-route-searchTerm="@Model.SearchTerm"
-                               asp-route-location="@Model.Location"
-                               asp-route-page="@i"
-                               asp-route-pageSize="@Model.PageSize">@i</a>
-                        </li>
-                    }
-                    <li class="page-item @(Model.Page == Model.TotalPages ? "disabled" : "")">
-                        <a class="page-link"
-                           asp-area="Admin"
-                           asp-controller="Events"
-                           asp-action="Index"
-                           asp-route-searchTerm="@Model.SearchTerm"
-                           asp-route-location="@Model.Location"
-                           asp-route-page="@(Model.Page + 1)"
-                           asp-route-pageSize="@Model.PageSize">Напред</a>
-                    </li>
-                </ul>
-            </nav>
         }
+    </div>
+
+    @if (Model.TotalPages > 1)
+    {
+        <nav aria-label="Events pagination" class="mt-4">
+            <ul class="pagination justify-content-center">
+                <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
+                    <a class="page-link"
+                       asp-area="Admin"
+                       asp-controller="Events"
+                       asp-action="Index"
+                       asp-route-searchTerm="@Model.SearchTerm"
+                       asp-route-location="@Model.Location"
+                       asp-route-page="@(Model.Page - 1)"
+                       asp-route-pageSize="@Model.PageSize">Назад</a>
+                </li>
+                @for (var i = 1; i <= Model.TotalPages; i++)
+                {
+                    <li class="page-item @(Model.Page == i ? "active" : "")">
+                        <a class="page-link"
+                           asp-area="Admin"
+                           asp-controller="Events"
+                           asp-action="Index"
+                           asp-route-searchTerm="@Model.SearchTerm"
+                           asp-route-location="@Model.Location"
+                           asp-route-page="@i"
+                           asp-route-pageSize="@Model.PageSize">@i</a>
+                    </li>
+                }
+                <li class="page-item @(Model.Page == Model.TotalPages ? "disabled" : "")">
+                    <a class="page-link"
+                       asp-area="Admin"
+                       asp-controller="Events"
+                       asp-action="Index"
+                       asp-route-searchTerm="@Model.SearchTerm"
+                       asp-route-location="@Model.Location"
+                       asp-route-page="@(Model.Page + 1)"
+                       asp-route-pageSize="@Model.PageSize">Напред</a>
+                </li>
+            </ul>
+        </nav>
     }
 </div>
+
+@section Scripts {
+    <script>
+        (() => {
+            const button = document.getElementById('loadEventsApiBtn');
+            const form = button?.closest('form');
+            const grid = document.getElementById('eventsGrid');
+
+            if (!button || !form || !grid) {
+                return;
+            }
+
+            const createEventCard = (eventItem) => {
+                const id = eventItem.id ?? eventItem.Id;
+                const titleText = eventItem.title ?? eventItem.Title ?? '';
+                const descriptionText = eventItem.description ?? eventItem.Description ?? '';
+                const locationText = eventItem.location ?? eventItem.Location ?? '';
+                const dateRaw = eventItem.date ?? eventItem.Date;
+                const date = dateRaw ? new Date(dateRaw) : null;
+
+                const col = document.createElement('div');
+                col.className = 'col-xl-4 col-md-6';
+
+                const article = document.createElement('article');
+                article.className = 'event-card';
+
+                const dateBadge = document.createElement('span');
+                dateBadge.className = 'event-card__date';
+                dateBadge.textContent = date ? date.toLocaleString('bg-BG') : '';
+
+                const title = document.createElement('h3');
+                title.className = 'event-card__title';
+                title.textContent = titleText;
+
+                const location = document.createElement('div');
+                location.className = 'event-card__location';
+                location.textContent = locationText;
+
+                const description = document.createElement('p');
+                description.className = 'event-card__description';
+                description.textContent = descriptionText.length > 140 ? `${descriptionText.substring(0, 140)}...` : descriptionText;
+
+                const actions = document.createElement('div');
+                actions.className = 'event-card__actions';
+
+                const details = document.createElement('a');
+                details.className = 'btn btn-outline-secondary btn-sm';
+                details.href = `/Admin/Events/Details/${id}`;
+                details.textContent = 'Детайли';
+
+                const edit = document.createElement('a');
+                edit.className = 'btn btn-outline-primary btn-sm';
+                edit.href = `/Admin/Events/Edit/${id}`;
+                edit.textContent = 'Редакция';
+
+                const del = document.createElement('a');
+                del.className = 'btn btn-outline-danger btn-sm';
+                del.href = `/Admin/Events/Delete/${id}`;
+                del.textContent = 'Изтриване';
+
+                actions.appendChild(details);
+                actions.appendChild(edit);
+                actions.appendChild(del);
+
+                article.appendChild(dateBadge);
+                article.appendChild(title);
+                article.appendChild(location);
+                article.appendChild(description);
+                article.appendChild(actions);
+                col.appendChild(article);
+                return col;
+            };
+
+            button.addEventListener('click', async () => {
+                const formData = new FormData(form);
+                const params = new URLSearchParams();
+                const searchTerm = (formData.get('searchTerm') ?? '').toString();
+                const location = (formData.get('location') ?? '').toString();
+                const pageSize = (formData.get('pageSize') ?? '6').toString();
+
+                if (searchTerm) {
+                    params.set('searchTerm', searchTerm);
+                }
+                if (location) {
+                    params.set('location', location);
+                }
+                params.set('page', '1');
+                params.set('pageSize', pageSize);
+
+                try {
+                    const response = await fetch(`/api/events?${params.toString()}`, {
+                        headers: { 'Accept': 'application/json' }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Cannot load events');
+                    }
+
+                    const payload = await response.json();
+                    const items = payload.items ?? payload.Items ?? [];
+
+                    grid.innerHTML = '';
+
+                    if (!items.length) {
+                        const col = document.createElement('div');
+                        col.className = 'col-12';
+                        const empty = document.createElement('div');
+                        empty.className = 'event-form-card text-center';
+                        empty.textContent = 'Няма събития за избраните филтри.';
+                        col.appendChild(empty);
+                        grid.appendChild(col);
+                    } else {
+                        items.forEach(item => grid.appendChild(createEventCard(item)));
+                    }
+                } catch (error) {
+                    console.error(error);
+                }
+            });
+        })();
+    </script>
+}
