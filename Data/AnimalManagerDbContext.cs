@@ -22,6 +22,7 @@ namespace Animatch.Data
 		public DbSet<Category> Categories { get; set; } = null!;
 		public DbSet<Models.Event> Events { get; set; } = null!;
 		public DbSet<WalkRequest> WalkRequests { get; set; } = null!;
+		public DbSet<OrganizationProfile> OrganizationProfiles { get; set; } = null!;
 
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)

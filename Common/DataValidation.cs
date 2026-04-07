@@ -30,5 +30,20 @@
 			public const int NameMaxLength = 100;
 		}
 
+		public static class OrganizationProfile
+		{
+			public const int OrganizationNameMinLength = 2;
+			public const int OrganizationNameMaxLength = 120;
+
+			public const int DescriptionMinLength = 20;
+			public const int DescriptionMaxLength = 2000;
+
+			public const int TownMinLength = 2;
+			public const int TownMaxLength = 100;
+
+			public const int PhoneNumberMinLength = 10;
+			public const int PhoneNumberMaxLength = 20;
+		}
+
 	}
 }
