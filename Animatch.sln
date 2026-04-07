@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35222.181
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Animatch", "Animatch.csproj", "{CEE26B47-EA50-47D1-AD14-1F1E1C01C511}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Animatch", "Animatch.csproj", "{CEE26B47-EA50-47D1-AD14-1F1E1C01C511}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestAnimatch", "UnitTestAnimatch\UnitTestAnimatch.csproj", "{A131F937-8FDF-45F1-9F14-F96154E9F2FB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{CEE26B47-EA50-47D1-AD14-1F1E1C01C511}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CEE26B47-EA50-47D1-AD14-1F1E1C01C511}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CEE26B47-EA50-47D1-AD14-1F1E1C01C511}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A131F937-8FDF-45F1-9F14-F96154E9F2FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A131F937-8FDF-45F1-9F14-F96154E9F2FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A131F937-8FDF-45F1-9F14-F96154E9F2FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A131F937-8FDF-45F1-9F14-F96154E9F2FB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

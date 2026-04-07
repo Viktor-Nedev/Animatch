@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="UnitTestAnimatch\**\*.cs" />
+    <Content Remove="UnitTestAnimatch\**" />
+    <None Remove="UnitTestAnimatch\**" />
+    <EmbeddedResource Remove="UnitTestAnimatch\**" />
     <Compile Remove="ViewModels\AnimalIndexViewModel.cs" />
   </ItemGroup>
 
