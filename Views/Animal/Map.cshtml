@@ -4,146 +4,260 @@
 }
 
 <div class="container mt-4">
-    <div class="row mb-5">
+    <div class="row mb-4">
         <div class="col-12 text-center">
-            <h1 class="display-4 fw-bold text-primary mb-3">
-                <i class="fas fa-map-marked-alt text-warning me-2"></i> Карта на нашите приятели
+            <h1 class="display-5 fw-bold text-success mb-2">
+                <i class="fas fa-map-marked-alt me-2"></i> Карта на нашите приятели
             </h1>
-            <p class="lead text-muted">Вижте къде се намират животните, които търсят своя нов дом!</p>
+            <p class="lead text-muted mb-0">Виж къде се намират животните и превключвай между OpenStreetMap и Mapbox.</p>
         </div>
     </div>
-    
-    <div class="card shadow-lg border-0" style="border-radius: 20px; overflow: hidden;">
-        <div class="card-body p-0">
-            <div id="map" style="width: 100%; height: 600px;"></div>
+
+    <div class="d-flex justify-content-center mb-3">
+        <div class="btn-group" role="group" aria-label="Map provider switch">
+            <button type="button" id="osmBtn" class="btn btn-success active">OpenStreetMap</button>
+            <button type="button" id="mapboxBtn" class="btn btn-outline-success">Mapbox</button>
+        </div>
+    </div>
+
+    <div id="mapWarning" class="alert alert-warning d-none"></div>
+
+    <div class="card shadow-lg border-0 map-card">
+        <div class="card-body p-0 map-host">
+            <div id="osmMap" class="map-surface"></div>
+            <div id="mapboxMap" class="map-surface d-none"></div>
         </div>
     </div>
 
     <div class="mt-4 text-center">
-        <a asp-action="Index" class="btn btn-outline-secondary px-5 py-3 rounded-pill shadow-sm">
+        <a asp-action="Index" class="btn btn-outline-secondary px-5 py-2 rounded-pill shadow-sm">
             <i class="fas fa-arrow-left me-2"></i> Обратно към списъка
         </a>
     </div>
 </div>
 
 @section Scripts {
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
     <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
-    
+
     <style>
+        .map-card {
+            border-radius: 18px;
+            overflow: hidden;
+        }
+
+        .map-host {
+            position: relative;
+            width: 100%;
+            height: 600px;
+        }
+
+        .map-surface {
+            position: absolute;
+            inset: 0;
+        }
+
+        .leaflet-popup-content-wrapper,
         .mapboxgl-popup-content {
             border-radius: 12px;
-            padding: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        .mapboxgl-popup-close-button {
-            padding: 5px;
-            line-height: normal;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.16);
         }
     </style>
 
     <script>
-        const mapboxKey = '@ViewBag.MapboxKey';
-        const mapContainer = document.getElementById('map');
-        
-        if (!mapboxKey || mapboxKey === '') {
-            console.error('Mapbox key is missing!');
-            const warning = document.createElement('div');
-            warning.className = 'alert alert-danger m-5';
-            warning.textContent = 'Mapbox API ключът липсва. Проверете .env файла.';
-            mapContainer.appendChild(warning);
-        } else {
-            mapboxgl.accessToken = mapboxKey;
-            
-            const map = new mapboxgl.Map({
-                container: 'map',
-                style: 'mapbox://styles/mapbox/streets-v12',
-                center: [25.4858, 42.7339],
-                zoom: 6.5
-            });
+        (() => {
+            const mapboxKey = '@ViewBag.MapboxKey';
+            const mapboxStyle = 'mapbox://styles/vikdev/cmlo8l453002c01qu7avs7rf3';
+            const defaultCenter = [42.7339, 25.4858];
 
-            
-            map.addControl(new mapboxgl.NavigationControl());
-            const createPopupContent = (animal) => {
-                const wrapper = document.createElement('div');
-                wrapper.className = 'text-center';
+            const osmBtn = document.getElementById('osmBtn');
+            const mapboxBtn = document.getElementById('mapboxBtn');
+            const osmMapElement = document.getElementById('osmMap');
+            const mapboxMapElement = document.getElementById('mapboxMap');
+            const warningBox = document.getElementById('mapWarning');
 
-                const title = document.createElement('h6');
-                title.className = 'fw-bold mb-1';
-                title.textContent = animal.name ?? '';
+            let animals = [];
+            let osmMap;
+            let mapboxMap;
+            let mapboxLoaded = false;
 
-                const species = document.createElement('p');
-                species.className = 'small text-muted mb-2';
-                species.textContent = animal.species ?? '';
+            const showWarning = (text) => {
+                warningBox.textContent = text;
+                warningBox.classList.remove('d-none');
+            };
 
-                const detailsLink = document.createElement('a');
-                detailsLink.className = 'btn btn-sm btn-primary w-100 rounded-pill';
-                detailsLink.href = `/Animal/Details/${animal.id}`;
-                detailsLink.textContent = 'Детайли';
+            const hideWarning = () => {
+                warningBox.textContent = '';
+                warningBox.classList.add('d-none');
+            };
 
-                wrapper.appendChild(title);
-                wrapper.appendChild(species);
-                wrapper.appendChild(detailsLink);
-                return wrapper;
+            const escapeHtml = (value) => {
+                if (!value) {
+                    return '';
+                }
+
+                return value
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#39;');
+            };
+
+            const popupHtml = (animal) => {
+                const id = animal.id ?? animal.Id;
+                const name = escapeHtml(animal.name ?? animal.Name ?? '');
+                const species = escapeHtml(animal.species ?? animal.Species ?? '');
+                return `<div class="text-center">
+                            <h6 class="fw-bold mb-1">${name}</h6>
+                            <p class="small text-muted mb-2">${species}</p>
+                            <a class="btn btn-sm btn-success w-100 rounded-pill" href="/Animal/Details/${id}">Детайли</a>
+                        </div>`;
+            };
+
+            const getCoordinates = (animal) => {
+                const lat = animal.latitude ?? animal.Latitude;
+                const lng = animal.longitude ?? animal.Longitude;
+                if (lat == null || lng == null) {
+                    return null;
+                }
+                return { lat, lng };
             };
 
             const loadAnimals = async () => {
-                try {
-                    const response = await fetch('/api/animals?withCoordinates=true&page=1&pageSize=200', {
-                        headers: { 'Accept': 'application/json' }
-                    });
+                const response = await fetch('/api/animals?withCoordinates=true&page=1&pageSize=500', {
+                    headers: { 'Accept': 'application/json' }
+                });
 
-                    if (!response.ok) {
-                        throw new Error('Cannot load animals');
+                if (!response.ok) {
+                    throw new Error('Cannot load animals');
+                }
+
+                const payload = await response.json();
+                animals = payload.items ?? payload.Items ?? [];
+            };
+
+            const initOsm = () => {
+                osmMap = L.map('osmMap').setView(defaultCenter, 7);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '&copy; OpenStreetMap contributors'
+                }).addTo(osmMap);
+
+                const bounds = [];
+
+                animals.forEach(animal => {
+                    const coordinates = getCoordinates(animal);
+                    if (!coordinates) {
+                        return;
                     }
 
-                    const payload = await response.json();
-                    const animals = payload.items ?? payload.Items ?? [];
+                    const marker = L.marker([coordinates.lat, coordinates.lng]).addTo(osmMap);
+                    marker.bindPopup(popupHtml(animal));
+                    bounds.push([coordinates.lat, coordinates.lng]);
+                });
 
-                    const bounds = new mapboxgl.LngLatBounds();
-                    let hasCoordinates = false;
-
-                    animals.forEach(animal => {
-                        const lat = animal.latitude ?? animal.Latitude;
-                        const lng = animal.longitude ?? animal.Longitude;
-                        if (lat != null && lng != null) {
-                            hasCoordinates = true;
-
-                            const popup = new mapboxgl.Popup({ offset: 25 })
-                                .setDOMContent(createPopupContent({
-                                    id: animal.id ?? animal.Id,
-                                    name: animal.name ?? animal.Name,
-                                    species: animal.species ?? animal.Species
-                                }));
-
-                            new mapboxgl.Marker({ color: '#ffc107' })
-                                .setLngLat([lng, lat])
-                                .setPopup(popup)
-                                .addTo(map);
-
-                            bounds.extend([lng, lat]);
-                        }
-                    });
-
-                    if (hasCoordinates) {
-                        map.fitBounds(bounds, { padding: 100, maxZoom: 14 });
-                    } else {
-                        const info = document.createElement('div');
-                        info.className = 'alert alert-info m-4';
-                        info.textContent = 'Няма намерени животни с координати.';
-                        mapContainer.appendChild(info);
-                    }
-                } catch (error) {
-                    console.error(error);
-                    const errorBox = document.createElement('div');
-                    errorBox.className = 'alert alert-danger m-4';
-                    errorBox.textContent = 'Възникна проблем при зареждане на данните от API.';
-                    mapContainer.appendChild(errorBox);
+                if (bounds.length > 0) {
+                    osmMap.fitBounds(bounds, { padding: [60, 60], maxZoom: 14 });
+                } else {
+                    showWarning('Няма намерени животни с координати.');
                 }
             };
 
-            loadAnimals();
-        }
+            const initMapbox = () => {
+                mapboxgl.accessToken = mapboxKey;
+                mapboxMap = new mapboxgl.Map({
+                    container: 'mapboxMap',
+                    style: mapboxStyle,
+                    center: [defaultCenter[1], defaultCenter[0]],
+                    zoom: 7
+                });
+
+                mapboxMap.addControl(new mapboxgl.NavigationControl());
+                mapboxMap.on('load', () => {
+                    const bounds = new mapboxgl.LngLatBounds();
+                    let hasPoints = false;
+
+                    animals.forEach(animal => {
+                        const coordinates = getCoordinates(animal);
+                        if (!coordinates) {
+                            return;
+                        }
+
+                        hasPoints = true;
+                        const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(popupHtml(animal));
+                        new mapboxgl.Marker({ color: '#2e7d32' })
+                            .setLngLat([coordinates.lng, coordinates.lat])
+                            .setPopup(popup)
+                            .addTo(mapboxMap);
+
+                        bounds.extend([coordinates.lng, coordinates.lat]);
+                    });
+
+                    if (hasPoints) {
+                        mapboxMap.fitBounds(bounds, { padding: 90, maxZoom: 14 });
+                    }
+                });
+            };
+
+            const setActiveButtons = (provider) => {
+                if (provider === 'osm') {
+                    osmBtn.classList.add('btn-success', 'active');
+                    osmBtn.classList.remove('btn-outline-success');
+                    mapboxBtn.classList.add('btn-outline-success');
+                    mapboxBtn.classList.remove('btn-success', 'active');
+                } else {
+                    mapboxBtn.classList.add('btn-success', 'active');
+                    mapboxBtn.classList.remove('btn-outline-success');
+                    osmBtn.classList.add('btn-outline-success');
+                    osmBtn.classList.remove('btn-success', 'active');
+                }
+            };
+
+            const switchToOsm = () => {
+                hideWarning();
+                osmMapElement.classList.remove('d-none');
+                mapboxMapElement.classList.add('d-none');
+                setActiveButtons('osm');
+                setTimeout(() => osmMap.invalidateSize(), 50);
+            };
+
+            const switchToMapbox = () => {
+                if (!mapboxKey || mapboxKey.trim() === '') {
+                    showWarning('Mapbox ключ липсва. Използвай OpenStreetMap или добави MAPBOX_KEY.');
+                    return;
+                }
+
+                hideWarning();
+                osmMapElement.classList.add('d-none');
+                mapboxMapElement.classList.remove('d-none');
+                setActiveButtons('mapbox');
+
+                if (!mapboxLoaded) {
+                    initMapbox();
+                    mapboxLoaded = true;
+                } else {
+                    setTimeout(() => mapboxMap.resize(), 80);
+                }
+            };
+
+            const bootstrap = async () => {
+                try {
+                    await loadAnimals();
+                    initOsm();
+                } catch (error) {
+                    console.error(error);
+                    showWarning('Възникна проблем при зареждане на данните от API.');
+                }
+            };
+
+            osmBtn.addEventListener('click', switchToOsm);
+            mapboxBtn.addEventListener('click', switchToMapbox);
+
+            bootstrap();
+        })();
     </script>
 }

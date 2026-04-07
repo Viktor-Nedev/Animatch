@@ -689,3 +689,130 @@ body {
         grid-template-columns: 1fr;
     }
 }
+
+.layout-shell {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.layout-content {
+    flex: 1;
+}
+
+.site-header {
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+}
+
+.site-navbar {
+    background: linear-gradient(120deg, #124533 0%, #1c7c58 55%, #33a06d 100%) !important;
+    box-shadow: 0 10px 20px rgba(12, 42, 31, 0.2);
+    border-bottom: 0;
+}
+
+.navbar-logo {
+    height: 92px;
+    width: auto;
+    display: block;
+    margin: -26px 0 -28px;
+}
+
+.nav-pills-gap {
+    gap: 0.45rem;
+}
+
+.nav-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    border-radius: 999px;
+    padding: 0.5rem 0.9rem !important;
+    color: #f5fff9 !important;
+    font-weight: 600;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.nav-chip:hover {
+    color: #ffffff !important;
+    background-color: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.nav-chip--accent {
+    background-color: rgba(255, 255, 255, 0.16);
+    border-color: rgba(255, 255, 255, 0.24);
+}
+
+.nav-chip--logout {
+    font: inherit;
+}
+
+.auth-nav .nav-link {
+    color: #f5fff9 !important;
+}
+
+.site-footer {
+    margin-top: 2rem;
+    padding: 1rem 0;
+    background: linear-gradient(120deg, #0f3e2f, #206a4e);
+    color: #e8fff0;
+}
+
+.footer-grid {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.footer-brand {
+    font-weight: 700;
+}
+
+.footer-copy {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.footer-links a {
+    color: #e8fff0;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.footer-links a:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 992px) {
+    .navbar-logo {
+        height: 82px;
+        margin: -18px 0 -22px;
+    }
+
+    .auth-nav {
+        margin-top: 0.4rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .site-navbar .container-fluid {
+        padding-left: 0.7rem;
+        padding-right: 0.7rem;
+    }
+
+    .navbar-logo {
+        height: 72px;
+        margin: -12px 0 -16px;
+    }
+}

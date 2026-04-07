@@ -6,9 +6,9 @@
     <title>@ViewData["Title"] - Animatch</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-
     <link rel="stylesheet" href="~/Animatch.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    @await RenderSectionAsync("HeadStyles", required: false)
 </head>
 <body>
 @{
@@ -16,71 +16,21 @@
     var isAuthPage = path.StartsWithSegments("/Identity/Account/Login")
         || path.StartsWithSegments("/Identity/Account/Register");
 }
-    @if (!isAuthPage)
-    {
-        <header>
-            <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-                <div class="container-fluid">
-                    <a class="navbar-brand d-flex align-items-center gap-2" asp-area="" asp-controller="Home" asp-action="Index">
-                        <img src="~/images/logo.png" alt="Animatch logo" class="navbar-logo" />
-                    </a>
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                            aria-expanded="false" aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-
-                    <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                         <ul class="navbar-nav flex-grow-1 ms-4 align-items-center">
-                            <li class="nav-item">
-                                <a class="nav-link text-dark fw-bold fs-5 px-3 py-2 rounded-pill hover-effect" asp-area="" asp-controller="Animal" asp-action="Index">Обяви</a>
-                            </li>
-                            <li class="nav-item ms-2">
-                                <a class="nav-link text-dark fw-bold fs-5 px-3 py-2 rounded-pill hover-effect bg-light" asp-area="" asp-controller="Animal" asp-action="Map">
-                                    <i class="fas fa-map-marked-alt text-warning me-1"></i> Карта
-                                </a>
-                            </li>
-                            @if (User.IsInRole("Administrator"))
-                            {
-                                <li class="nav-item ms-2">
-                                    <a class="nav-link text-dark fw-bold fs-5 px-3 py-2 rounded-pill hover-effect bg-light" asp-area="Admin" asp-controller="Events" asp-action="Index">
-                                        <i class="fas fa-calendar-alt text-success me-1"></i> Събития
-                                    </a>
-                                </li>
-                            }
-                            @if (User.Identity?.IsAuthenticated == true)
-                            {
-                                <li class="nav-item ms-2">
-                                    <a class="nav-link text-dark fw-bold fs-5 px-3 py-2 rounded-pill hover-effect bg-light" asp-area="" asp-controller="Requests" asp-action="MyRequests">
-                                        <i class="fas fa-clipboard-list text-success me-1"></i> Заявки
-                                    </a>
-                                </li>
-                                <li class="nav-item ms-2">
-                                    <a class="nav-link text-dark fw-bold fs-5 px-3 py-2 rounded-pill hover-effect bg-light" asp-area="" asp-controller="Animal" asp-action="Profile">
-                                        <i class="fas fa-user-circle text-primary me-1"></i> Профил
-                                    </a>
-                                </li>
-                            }
-                        </ul>
-                        <partial name="_LoginPartial" />
-                    </div>
-                </div>
-            </nav>
-        </header>
-    }
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+    <div class="layout-shell">
+        @if (!isAuthPage)
+        {
+            <partial name="_NavbarPartial" />
+        }
+        <div class="container layout-content">
+            <main role="main" class="pb-3">
+                @RenderBody()
+            </main>
+        </div>
+        @if (!isAuthPage)
+        {
+            <partial name="_FooterPartial" />
+        }
     </div>
-
-    @if (!isAuthPage)
-    {
-        <footer class="border-top footer">
-            <div class="container">
-                &copy; 2026 - Animatch
-            </div>
-        </footer>
-    }
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

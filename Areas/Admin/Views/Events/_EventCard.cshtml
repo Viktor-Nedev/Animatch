@@ -1,0 +1,41 @@
+@model Animatch.Models.Event
+
+<div class="col-xl-4 col-md-6">
+    <div class="card h-100 event-card">
+        <div class="event-card-top">
+            <span class="event-card__date">
+                <i class="far fa-calendar-alt"></i>
+                @Model.Date.ToString("dd.MM.yyyy HH:mm")
+            </span>
+            <span class="event-card__badge">
+                <i class="fas fa-hand-holding-heart me-1"></i> Инициатива
+            </span>
+        </div>
+        <div class="card-body">
+            <h4 class="card-title mb-3 text-success">@Model.Title</h4>
+            <p class="card-text mb-2 event-card__location">
+                <i class="fas fa-location-dot"></i>
+                <strong>@Model.Location</strong>
+            </p>
+            <p class="card-text event-card__description">
+                @(Model.Description.Length > 140 ? Model.Description.Substring(0, 140) + "..." : Model.Description)
+            </p>
+        </div>
+        <div class="card-footer bg-white border-0 pb-3 px-3">
+            <div class="event-card__actions">
+                <a asp-area="Admin" asp-controller="Events" asp-action="Details" asp-route-id="@Model.Id" class="btn btn-success btn-sm">
+                    Детайли
+                </a>
+                <a asp-area="Admin" asp-controller="Events" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-primary btn-sm">
+                    Редакция
+                </a>
+                <a asp-area="Admin" asp-controller="Events" asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger btn-sm">
+                    Изтриване
+                </a>
+                <a class="btn btn-outline-success btn-sm" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&query=@Uri.EscapeDataString(Model.Location)">
+                    Карта
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

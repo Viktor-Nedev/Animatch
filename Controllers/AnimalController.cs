@@ -6,6 +6,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Animatch.Services;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace Animatch.Controllers
 {
@@ -100,6 +101,8 @@ namespace Animatch.Controllers
         [Authorize]
         public async Task<IActionResult> Create(Animal animal)
         {
+            NormalizeCoordinates(animal);
+
             var category = await categoryService.GetByIdAsync(animal.CategoryId);
             if (category == null)
             {
@@ -163,6 +166,8 @@ namespace Animatch.Controllers
             {
                 return NotFound();
             }
+
+            NormalizeCoordinates(animal);
 
             var category = await categoryService.GetByIdAsync(animal.CategoryId);
             if (category == null)
@@ -322,6 +327,105 @@ namespace Animatch.Controllers
         {
             var userId = GetUserId();
             return !string.IsNullOrEmpty(userId) && animal.OwnerId == userId;
+        }
+
+        private void NormalizeCoordinates(Animal animal)
+        {
+            var latitudeRaw = Request.Form["Latitude"].ToString();
+            var longitudeRaw = Request.Form["Longitude"].ToString();
+            ModelState.Remove(nameof(Animal.Latitude));
+            ModelState.Remove(nameof(Animal.Longitude));
+
+            if (TryParsePair(latitudeRaw, out var pairLat, out var pairLng) && string.IsNullOrWhiteSpace(longitudeRaw))
+            {
+                animal.Latitude = pairLat;
+                animal.Longitude = pairLng;
+                ValidateCoordinateRange(animal.Latitude, animal.Longitude);
+                return;
+            }
+
+            if (!TryParseSingle(latitudeRaw, out var latitude))
+            {
+                ModelState.AddModelError(nameof(Animal.Latitude), "Невалидна географска ширина.");
+            }
+
+            if (!TryParseSingle(longitudeRaw, out var longitude))
+            {
+                ModelState.AddModelError(nameof(Animal.Longitude), "Невалидна географска дължина.");
+            }
+
+            animal.Latitude = latitude;
+            animal.Longitude = longitude;
+            ValidateCoordinateRange(animal.Latitude, animal.Longitude);
+        }
+
+        private static bool TryParsePair(string? input, out double? latitude, out double? longitude)
+        {
+            latitude = null;
+            longitude = null;
+
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return false;
+            }
+
+            var compact = input.Trim();
+            if (!compact.Contains(", ") && !compact.Contains(";"))
+            {
+                return false;
+            }
+
+            var parts = compact.Split(new[] { ",", ";" }, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length != 2)
+            {
+                return false;
+            }
+
+            if (!TryParseSingle(parts[0], out latitude) || !TryParseSingle(parts[1], out longitude))
+            {
+                return false;
+            }
+
+            return latitude.HasValue && longitude.HasValue;
+        }
+
+        private static bool TryParseSingle(string? input, out double? value)
+        {
+            value = null;
+
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return true;
+            }
+
+            var normalized = input.Trim().Replace(',', '.');
+
+            if (double.TryParse(normalized, NumberStyles.Float, CultureInfo.InvariantCulture, out var parsed))
+            {
+                value = parsed;
+                return true;
+            }
+
+            if (double.TryParse(input, NumberStyles.Float, CultureInfo.CurrentCulture, out parsed))
+            {
+                value = parsed;
+                return true;
+            }
+
+            return false;
+        }
+
+        private void ValidateCoordinateRange(double? latitude, double? longitude)
+        {
+            if (latitude.HasValue && (latitude < -90 || latitude > 90))
+            {
+                ModelState.AddModelError(nameof(Animal.Latitude), "Географската ширина трябва да е между -90 и 90.");
+            }
+
+            if (longitude.HasValue && (longitude < -180 || longitude > 180))
+            {
+                ModelState.AddModelError(nameof(Animal.Longitude), "Географската дължина трябва да е между -180 и 180.");
+            }
         }
     }
 }

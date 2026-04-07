@@ -3,16 +3,20 @@
     ViewData["Title"] = "Редакция на събитие";
 }
 
-<link rel="stylesheet" href="~/css/admin-events.css" asp-append-version="true" />
+@section HeadStyles {
+    <link rel="stylesheet" href="~/css/admin-events.css" asp-append-version="true" />
+}
 
-<div class="container event-admin-shell">
-    <section class="event-admin-hero">
-        <h2>Редакция на събитие</h2>
-        <p>Обнови информацията за инициативата и поддържай събитията актуални.</p>
-    </section>
+<div class="container mt-5 event-admin-shell">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+        <h1 class="page-title m-0">Редакция на събитие</h1>
+        <a asp-area="Admin" asp-controller="Events" asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Към детайли
+        </a>
+    </div>
 
-    <div class="event-form-card">
-        <form asp-area="Admin" asp-controller="Events" asp-action="Edit" method="post">
+    <div class="card h-100 event-form-card">
+        <form asp-area="Admin" asp-controller="Events" asp-action="Edit" method="post" class="card-body">
             <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
             <input type="hidden" asp-for="Id" />
 
@@ -53,3 +57,4 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
+

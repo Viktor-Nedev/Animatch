@@ -1,54 +1,62 @@
 .event-admin-shell {
-    margin-top: 1.5rem;
     margin-bottom: 2rem;
 }
 
-.event-admin-hero {
-    background: linear-gradient(135deg, #0f3f31 0%, #1f7a5a 60%, #2ba877 100%);
-    border-radius: 24px;
-    padding: 2rem;
-    color: #f4fff8;
-    box-shadow: 0 16px 36px rgba(9, 39, 30, 0.28);
+.event-stat-card {
+    border: 1px solid #d8eadf;
+    border-radius: 16px;
+    box-shadow: 0 8px 18px rgba(20, 75, 53, 0.1);
 }
 
-.event-admin-hero h1,
-.event-admin-hero h2 {
-    margin: 0;
-    font-size: clamp(1.6rem, 2.2vw, 2.3rem);
-    font-weight: 800;
-}
-
-.event-admin-hero p {
-    margin-top: 0.75rem;
-    margin-bottom: 0;
-    color: rgba(244, 255, 248, 0.88);
-    max-width: 720px;
-}
-
-.event-admin-actions {
-    margin-top: 1.25rem;
+.event-stat-card .card-body {
     display: flex;
-    gap: 0.75rem;
-    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.85rem;
 }
 
-.event-card-grid {
-    margin-top: 1.5rem;
+.event-stat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    color: #f6fff9;
+    background: linear-gradient(135deg, #0f5f45, #26a269);
+}
+
+.event-stat-label {
+    margin: 0;
+    color: #4f7266;
+    font-weight: 600;
+}
+
+.event-stat-value {
+    margin: 0;
+    font-size: 1.45rem;
+    font-weight: 800;
+    color: #0f3c2e;
+}
+
+.event-filters {
+    border-radius: 16px;
+    border: 1px solid #d9eadf;
 }
 
 .event-card {
-    border: 0;
-    border-radius: 20px;
-    padding: 1.1rem;
-    background: #ffffff;
-    box-shadow: 0 10px 26px rgba(27, 94, 32, 0.12);
-    height: 100%;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-radius: 16px;
+    border-left: 5px solid #2e7d32;
+    border-top: 1px solid #e4efe8;
+    border-right: 1px solid #e4efe8;
+    border-bottom: 1px solid #e4efe8;
+    box-shadow: 0 10px 22px rgba(18, 69, 49, 0.1);
 }
 
-.event-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 16px 30px rgba(27, 94, 32, 0.18);
+.event-card-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.6rem;
+    align-items: center;
+    padding: 0.9rem 1rem 0;
 }
 
 .event-card__date {
@@ -56,30 +64,34 @@
     align-items: center;
     gap: 0.35rem;
     border-radius: 999px;
-    padding: 0.35rem 0.75rem;
-    font-size: 0.82rem;
+    padding: 0.3rem 0.7rem;
+    font-size: 0.8rem;
     font-weight: 700;
     color: #116149;
     background: #dff6ec;
 }
 
-.event-card__title {
-    margin: 0.9rem 0 0.4rem;
-    font-size: 1.15rem;
-    font-weight: 800;
-    color: #103d31;
+.event-card__badge {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 0.28rem 0.65rem;
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: #2e7d32;
+    background: #ebf7ed;
 }
 
 .event-card__location {
-    color: #557a6f;
-    font-size: 0.95rem;
-    margin-bottom: 0.65rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
 }
 
 .event-card__description {
     color: #2f5046;
-    margin-bottom: 0.85rem;
     line-height: 1.45;
+    min-height: 56px;
 }
 
 .event-card__actions {
@@ -88,15 +100,20 @@
     gap: 0.45rem;
 }
 
+.event-card__actions .btn {
+    border-radius: 10px;
+}
+
 .event-form-card,
 .event-detail-card,
 .event-danger-card {
-    margin-top: 1.5rem;
-    border: 0;
-    border-radius: 22px;
-    background: #fff;
-    box-shadow: 0 12px 30px rgba(21, 63, 47, 0.12);
-    padding: 1.5rem;
+    border-radius: 18px;
+    border: 1px solid #d8eadf;
+    box-shadow: 0 10px 24px rgba(20, 70, 50, 0.12);
+}
+
+.event-form-card .card-body {
+    padding: 1.4rem;
 }
 
 .event-form-grid {
@@ -123,17 +140,30 @@
     padding: 0.65rem 0.75rem;
 }
 
-.event-form-card .form-control:focus {
+.event-form-card .form-control:focus,
+.event-form-card .form-select:focus {
     border-color: #26a269;
     box-shadow: 0 0 0 0.2rem rgba(38, 162, 105, 0.2);
+}
+
+.event-admin-actions {
+    margin-top: 1.25rem;
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.event-detail-card,
+.event-danger-card {
+    padding: 1.3rem;
 }
 
 .event-detail-header {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     flex-wrap: wrap;
     gap: 0.8rem;
-    align-items: center;
     border-bottom: 1px solid #e5efe9;
     padding-bottom: 0.9rem;
     margin-bottom: 1rem;
@@ -141,9 +171,9 @@
 
 .event-detail-title {
     margin: 0;
+    color: #123d31;
     font-size: clamp(1.4rem, 2vw, 2rem);
     font-weight: 800;
-    color: #123d31;
 }
 
 .event-meta {
@@ -187,7 +217,7 @@
 }
 
 .event-danger-card {
-    border: 1px solid #ffd9d9;
+    border-color: #ffd9d9;
     background: #fff7f7;
 }
 

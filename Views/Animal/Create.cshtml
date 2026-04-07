@@ -75,13 +75,15 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label asp-for="Latitude" class="form-label small text-muted">Географска ширина (Lat)</label>
-                                            <input asp-for="Latitude" class="form-control" placeholder="Напр: 42.73" />
+                                            <input asp-for="Latitude" type="number" step="any" class="form-control" placeholder="43.06444117095392" />
+                                            <span asp-validation-for="Latitude" class="text-danger small"></span>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label asp-for="Longitude" class="form-label small text-muted">Географска дължина (Lng)</label>
-                                            <input asp-for="Longitude" class="form-control" placeholder="Напр: 25.48" />
+                                            <input asp-for="Longitude" type="number" step="any" class="form-control" placeholder="25.590345964587424" />
+                                            <span asp-validation-for="Longitude" class="text-danger small"></span>
                                         </div>
                                     </div>
                                 </div>

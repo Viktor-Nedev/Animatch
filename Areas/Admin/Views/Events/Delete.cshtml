@@ -3,24 +3,28 @@
     ViewData["Title"] = "Изтриване на събитие";
 }
 
-<link rel="stylesheet" href="~/css/admin-events.css" asp-append-version="true" />
+@section HeadStyles {
+    <link rel="stylesheet" href="~/css/admin-events.css" asp-append-version="true" />
+}
 
-<div class="container event-admin-shell">
-    <section class="event-admin-hero">
-        <h2>Изтриване на събитие</h2>
-        <p>Потвърди операцията. Това действие не може да бъде отменено.</p>
-    </section>
+<div class="container mt-5 event-admin-shell">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+        <h1 class="page-title m-0">Изтриване на събитие</h1>
+        <a asp-area="Admin" asp-controller="Events" asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Към детайли
+        </a>
+    </div>
 
-    <article class="event-danger-card">
+    <article class="card h-100 event-danger-card">
         <h4 class="event-danger-title">Ще бъде изтрито: @Model.Title</h4>
         <div class="event-meta">
             <div class="event-meta-item">
                 <span class="event-meta-label">Дата</span>
-                <span class="event-meta-value">@Model.Date.ToString("dd.MM.yyyy HH:mm")</span>
+                <span class="event-meta-value"><i class="far fa-calendar-alt me-1"></i>@Model.Date.ToString("dd.MM.yyyy HH:mm")</span>
             </div>
             <div class="event-meta-item">
                 <span class="event-meta-label">Локация</span>
-                <span class="event-meta-value">@Model.Location</span>
+                <span class="event-meta-value"><i class="fas fa-location-dot me-1"></i>@Model.Location</span>
             </div>
         </div>
         <div class="event-description">@Model.Description</div>
@@ -32,3 +36,4 @@
         </form>
     </article>
 </div>
+
