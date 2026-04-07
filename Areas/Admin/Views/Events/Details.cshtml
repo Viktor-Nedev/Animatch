@@ -1,6 +1,9 @@
 @model Animatch.Models.Event
 @{
     ViewData["Title"] = "Детайли за събитие";
+    var mapQuery = Model.Latitude.HasValue && Model.Longitude.HasValue
+        ? $"{Model.Latitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)},{Model.Longitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)}"
+        : Model.Location;
 }
 
 @section HeadStyles {
@@ -37,14 +40,26 @@
                     <i class="fas fa-user-pen me-1"></i>@Model.CreatedById
                 </span>
             </div>
+            @if (Model.Latitude.HasValue && Model.Longitude.HasValue)
+            {
+                <div class="event-meta-item">
+                    <span class="event-meta-label">Координати</span>
+                    <span class="event-meta-value">
+                        @Model.Latitude.Value.ToString("F14"), @Model.Longitude.Value.ToString("F14")
+                    </span>
+                </div>
+            }
         </div>
 
         <div class="event-description">@Model.Description</div>
 
         <div class="event-admin-actions">
-            <a asp-area="Admin" asp-controller="Events" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Редакция</a>
-            <a asp-area="Admin" asp-controller="Events" asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger">Изтриване</a>
-            <a class="btn btn-outline-success" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&query=@Uri.EscapeDataString(Model.Location)">
+            @if (User.IsInRole("Administrator"))
+            {
+                <a asp-area="Admin" asp-controller="Events" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Редакция</a>
+                <a asp-area="Admin" asp-controller="Events" asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger">Изтриване</a>
+            }
+            <a class="btn btn-outline-success" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&query=@Uri.EscapeDataString(mapQuery)">
                 <i class="fas fa-map-location-dot me-1"></i>Отвори карта
             </a>
             <a asp-area="Admin" asp-controller="Events" asp-action="Index" class="btn btn-outline-secondary">Назад</a>

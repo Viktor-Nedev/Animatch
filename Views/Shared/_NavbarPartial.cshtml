@@ -21,7 +21,7 @@
                             <span>Карта</span>
                         </a>
                     </li>
-                    @if (User.IsInRole("Administrator"))
+                    @if (User.Identity?.IsAuthenticated == true)
                     {
                         <li class="nav-item">
                             <a class="nav-link nav-chip" asp-area="Admin" asp-controller="Events" asp-action="Index">
@@ -32,12 +32,15 @@
                     }
                     @if (User.Identity?.IsAuthenticated == true)
                     {
-                        <li class="nav-item">
-                            <a class="nav-link nav-chip" asp-area="" asp-controller="Requests" asp-action="MyRequests">
-                                <i class="fas fa-clipboard-list"></i>
-                                <span>Заявки</span>
-                            </a>
-                        </li>
+                        @if (User.IsInRole("Administrator"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link nav-chip" asp-area="" asp-controller="Requests" asp-action="MyRequests">
+                                    <i class="fas fa-clipboard-list"></i>
+                                    <span>Заявки</span>
+                                </a>
+                            </li>
+                        }
                         <li class="nav-item">
                             <a class="nav-link nav-chip" asp-area="" asp-controller="Animal" asp-action="Profile">
                                 <i class="fas fa-user-circle"></i>

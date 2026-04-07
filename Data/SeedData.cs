@@ -8,6 +8,7 @@ namespace Animatch.Data
     public static class SeedData
     {
         private const string UserRole = "User";
+        private const string OrganizerRole = "Organizer";
         private const string AdminRole = "Administrator";
 
         public static async Task InitializeAsync(IServiceProvider services, IConfiguration configuration)
@@ -15,6 +16,7 @@ namespace Animatch.Data
             var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
 
             await EnsureRoleAsync(roleManager, UserRole);
+            await EnsureRoleAsync(roleManager, OrganizerRole);
             await EnsureRoleAsync(roleManager, AdminRole);
         }
 

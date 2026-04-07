@@ -20,6 +20,11 @@
         </div>
     </div>
 
+    <div class="d-flex justify-content-center gap-3 flex-wrap mb-3">
+        <span class="badge text-bg-success px-3 py-2"><i class="fas fa-paw me-1"></i> Животни</span>
+        <span class="badge text-bg-warning px-3 py-2"><i class="fas fa-calendar-check me-1"></i> Събития</span>
+    </div>
+
     <div id="mapWarning" class="alert alert-warning d-none"></div>
 
     <div class="card shadow-lg border-0 map-card">
@@ -71,6 +76,7 @@
         (() => {
             const mapboxKey = '@ViewBag.MapboxKey';
             const mapboxStyle = 'mapbox://styles/vikdev/cmlo8l453002c01qu7avs7rf3';
+            const mapboxFallbackStyle = 'mapbox://styles/mapbox/streets-v12';
             const defaultCenter = [42.7339, 25.4858];
 
             const osmBtn = document.getElementById('osmBtn');
@@ -80,9 +86,11 @@
             const warningBox = document.getElementById('mapWarning');
 
             let animals = [];
+            let events = [];
             let osmMap;
             let mapboxMap;
             let mapboxLoaded = false;
+            let styleFallbackApplied = false;
 
             const showWarning = (text) => {
                 warningBox.textContent = text;
@@ -107,7 +115,7 @@
                     .replace(/'/g, '&#39;');
             };
 
-            const popupHtml = (animal) => {
+            const animalPopupHtml = (animal) => {
                 const id = animal.id ?? animal.Id;
                 const name = escapeHtml(animal.name ?? animal.Name ?? '');
                 const species = escapeHtml(animal.species ?? animal.Species ?? '');
@@ -118,26 +126,45 @@
                         </div>`;
             };
 
-            const getCoordinates = (animal) => {
-                const lat = animal.latitude ?? animal.Latitude;
-                const lng = animal.longitude ?? animal.Longitude;
+            const eventPopupHtml = (eventItem) => {
+                const id = eventItem.id ?? eventItem.Id;
+                const title = escapeHtml(eventItem.title ?? eventItem.Title ?? '');
+                const dateRaw = eventItem.date ?? eventItem.Date;
+                const date = dateRaw ? new Date(dateRaw).toLocaleString('bg-BG') : '';
+                return `<div class="text-center">
+                            <h6 class="fw-bold mb-1">${title}</h6>
+                            <p class="small text-muted mb-2">${date}</p>
+                            <a class="btn btn-sm btn-warning w-100 rounded-pill" href="/Admin/Events/Details/${id}">Детайли</a>
+                        </div>`;
+            };
+
+            const getCoordinates = (item) => {
+                const lat = item.latitude ?? item.Latitude;
+                const lng = item.longitude ?? item.Longitude;
                 if (lat == null || lng == null) {
                     return null;
                 }
                 return { lat, lng };
             };
 
-            const loadAnimals = async () => {
-                const response = await fetch('/api/animals?withCoordinates=true&page=1&pageSize=500', {
-                    headers: { 'Accept': 'application/json' }
-                });
+            const loadData = async () => {
+                const [animalsResponse, eventsResponse] = await Promise.all([
+                    fetch('/api/animals?withCoordinates=true&page=1&pageSize=500', {
+                        headers: { 'Accept': 'application/json' }
+                    }),
+                    fetch('/api/events?withCoordinates=true&page=1&pageSize=500', {
+                        headers: { 'Accept': 'application/json' }
+                    })
+                ]);
 
-                if (!response.ok) {
-                    throw new Error('Cannot load animals');
+                if (!animalsResponse.ok || !eventsResponse.ok) {
+                    throw new Error('Cannot load map data');
                 }
 
-                const payload = await response.json();
-                animals = payload.items ?? payload.Items ?? [];
+                const animalsPayload = await animalsResponse.json();
+                const eventsPayload = await eventsResponse.json();
+                animals = animalsPayload.items ?? animalsPayload.Items ?? [];
+                events = eventsPayload.items ?? eventsPayload.Items ?? [];
             };
 
             const initOsm = () => {
@@ -156,19 +183,36 @@
                     }
 
                     const marker = L.marker([coordinates.lat, coordinates.lng]).addTo(osmMap);
-                    marker.bindPopup(popupHtml(animal));
+                    marker.bindPopup(animalPopupHtml(animal));
+                    bounds.push([coordinates.lat, coordinates.lng]);
+                });
+
+                events.forEach(eventItem => {
+                    const coordinates = getCoordinates(eventItem);
+                    if (!coordinates) {
+                        return;
+                    }
+
+                    const marker = L.circleMarker([coordinates.lat, coordinates.lng], {
+                        radius: 9,
+                        color: '#bd7d00',
+                        fillColor: '#ffc107',
+                        fillOpacity: 0.95,
+                        weight: 2
+                    }).addTo(osmMap);
+                    marker.bindPopup(eventPopupHtml(eventItem));
                     bounds.push([coordinates.lat, coordinates.lng]);
                 });
 
                 if (bounds.length > 0) {
                     osmMap.fitBounds(bounds, { padding: [60, 60], maxZoom: 14 });
                 } else {
-                    showWarning('Няма намерени животни с координати.');
+                    showWarning('Няма намерени животни или събития с координати.');
                 }
             };
 
             const initMapbox = () => {
-                mapboxgl.accessToken = mapboxKey;
+                mapboxgl.accessToken = mapboxKey.trim();
                 mapboxMap = new mapboxgl.Map({
                     container: 'mapboxMap',
                     style: mapboxStyle,
@@ -177,6 +221,14 @@
                 });
 
                 mapboxMap.addControl(new mapboxgl.NavigationControl());
+                mapboxMap.on('error', (event) => {
+                    const message = event?.error?.message ?? '';
+                    if (!styleFallbackApplied && message.toLowerCase().includes('style')) {
+                        styleFallbackApplied = true;
+                        mapboxMap.setStyle(mapboxFallbackStyle);
+                        showWarning('Custom Mapbox стилът не се зареди. Зареден е резервен стил.');
+                    }
+                });
                 mapboxMap.on('load', () => {
                     const bounds = new mapboxgl.LngLatBounds();
                     let hasPoints = false;
@@ -188,8 +240,24 @@
                         }
 
                         hasPoints = true;
-                        const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(popupHtml(animal));
+                        const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(animalPopupHtml(animal));
                         new mapboxgl.Marker({ color: '#2e7d32' })
+                            .setLngLat([coordinates.lng, coordinates.lat])
+                            .setPopup(popup)
+                            .addTo(mapboxMap);
+
+                        bounds.extend([coordinates.lng, coordinates.lat]);
+                    });
+
+                    events.forEach(eventItem => {
+                        const coordinates = getCoordinates(eventItem);
+                        if (!coordinates) {
+                            return;
+                        }
+
+                        hasPoints = true;
+                        const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(eventPopupHtml(eventItem));
+                        new mapboxgl.Marker({ color: '#f39c12' })
                             .setLngLat([coordinates.lng, coordinates.lat])
                             .setPopup(popup)
                             .addTo(mapboxMap);
@@ -246,7 +314,7 @@
 
             const bootstrap = async () => {
                 try {
-                    await loadAnimals();
+                    await loadData();
                     initOsm();
                 } catch (error) {
                     console.error(error);

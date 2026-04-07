@@ -7,7 +7,7 @@ using System.Security.Claims;
 namespace Animatch.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Administrator")]
+    [Authorize]
     public class EventsController : Controller
     {
         private readonly IEventService eventService;
@@ -51,6 +51,7 @@ namespace Animatch.Areas.Admin.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Organizer,Administrator")]
         public IActionResult Create()
         {
             return View(new Event { Date = DateTime.Now });
@@ -58,6 +59,7 @@ namespace Animatch.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Organizer,Administrator")]
         public async Task<IActionResult> Create(Event ev)
         {
             if (!ModelState.IsValid)
@@ -73,6 +75,7 @@ namespace Animatch.Areas.Admin.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Edit(int id)
         {
             var ev = await eventService.GetByIdAsync(id);
@@ -86,6 +89,7 @@ namespace Animatch.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Edit(int id, Event ev)
         {
             if (id != ev.Id)
@@ -115,6 +119,7 @@ namespace Animatch.Areas.Admin.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Delete(int id)
         {
             var ev = await eventService.GetByIdAsync(id);
@@ -128,6 +133,7 @@ namespace Animatch.Areas.Admin.Controllers
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var ev = await eventService.GetByIdAsync(id);

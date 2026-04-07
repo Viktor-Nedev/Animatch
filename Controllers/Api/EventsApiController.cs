@@ -19,6 +19,7 @@ namespace Animatch.Controllers.Api
         public async Task<IActionResult> Get(
             string? searchTerm = null,
             string? location = null,
+            bool withCoordinates = false,
             int page = 1,
             int pageSize = 10)
         {
@@ -39,6 +40,11 @@ namespace Animatch.Controllers.Api
                 query = query.Where(e => e.Location.ToLower().Contains(normalizedLocation));
             }
 
+            if (withCoordinates)
+            {
+                query = query.Where(e => e.Latitude.HasValue && e.Longitude.HasValue);
+            }
+
             var totalCount = await query.CountAsync();
 
             var items = await query
@@ -51,7 +57,9 @@ namespace Animatch.Controllers.Api
                     e.Title,
                     e.Description,
                     e.Date,
-                    e.Location
+                    e.Location,
+                    e.Latitude,
+                    e.Longitude
                 })
                 .ToListAsync();
 

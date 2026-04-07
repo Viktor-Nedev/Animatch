@@ -13,28 +13,28 @@ namespace Animatch.Areas.Identity.Pages.Account
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.RazorPages;
     using Microsoft.AspNetCore.WebUtilities;
-    using Microsoft.EntityFrameworkCore;
 
     public class RegisterModel : PageModel
     {
+        private const string UserRole = "User";
+        private const string OrganizerRole = "Organizer";
+        private const string AdminRole = "Administrator";
+
         private readonly SignInManager<IdentityUser> signInManager;
         private readonly UserManager<IdentityUser> userManager;
         private readonly IUserStore<IdentityUser> userStore;
         private readonly IUserEmailStore<IdentityUser> emailStore;
-        private readonly RoleManager<IdentityRole> roleManager;
 
 
         public RegisterModel(
             UserManager<IdentityUser> userManager,
             IUserStore<IdentityUser> userStore,
-            SignInManager<IdentityUser> signInManager,
-            RoleManager<IdentityRole> roleManager)
+            SignInManager<IdentityUser> signInManager)
         {
             this.userManager = userManager;
             this.userStore = userStore;
             this.emailStore = GetEmailStore();
             this.signInManager = signInManager;
-            this.roleManager = roleManager;
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace Animatch.Areas.Identity.Pages.Account
         /// </summary>
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
-        public IList<string> AvailableRoles { get; set; } = new List<string>();
+        public IList<string> AvailableRoles { get; set; } = new List<string> { UserRole, OrganizerRole, AdminRole };
 
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -103,7 +103,7 @@ namespace Animatch.Areas.Identity.Pages.Account
 
             [Required]
             [Display(Name = "Role")]
-            public string Role { get; set; } = "User";
+            public string Role { get; set; } = UserRole;
         }
 
 
@@ -111,20 +111,12 @@ namespace Animatch.Areas.Identity.Pages.Account
         {
             ReturnUrl = returnUrl ?? Url.Content("~/Animal");
             ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-            AvailableRoles = await roleManager.Roles
-                .Select(r => r.Name!)
-                .OrderBy(r => r)
-                .ToListAsync();
         }
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
             returnUrl ??= Url.Content("~/Animal");
             ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-            AvailableRoles = await roleManager.Roles
-                .Select(r => r.Name!)
-                .OrderBy(r => r)
-                .ToListAsync();
 
             if (!AvailableRoles.Contains(Input.Role))
             {

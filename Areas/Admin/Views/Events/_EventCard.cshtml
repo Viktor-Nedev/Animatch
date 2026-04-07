@@ -1,4 +1,9 @@
 @model Animatch.Models.Event
+@{
+    var mapQuery = Model.Latitude.HasValue && Model.Longitude.HasValue
+        ? $"{Model.Latitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)},{Model.Longitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)}"
+        : Model.Location;
+}
 
 <div class="col-xl-4 col-md-6">
     <div class="card h-100 event-card">
@@ -26,13 +31,16 @@
                 <a asp-area="Admin" asp-controller="Events" asp-action="Details" asp-route-id="@Model.Id" class="btn btn-success btn-sm">
                     Детайли
                 </a>
-                <a asp-area="Admin" asp-controller="Events" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-primary btn-sm">
-                    Редакция
-                </a>
-                <a asp-area="Admin" asp-controller="Events" asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger btn-sm">
-                    Изтриване
-                </a>
-                <a class="btn btn-outline-success btn-sm" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&query=@Uri.EscapeDataString(Model.Location)">
+                @if (User.IsInRole("Administrator"))
+                {
+                    <a asp-area="Admin" asp-controller="Events" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-primary btn-sm">
+                        Редакция
+                    </a>
+                    <a asp-area="Admin" asp-controller="Events" asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger btn-sm">
+                        Изтриване
+                    </a>
+                }
+                <a class="btn btn-outline-success btn-sm" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&query=@Uri.EscapeDataString(mapQuery)">
                     Карта
                 </a>
             </div>

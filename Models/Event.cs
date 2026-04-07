@@ -23,6 +23,12 @@ namespace Animatch.Models
         [StringLength(200, MinimumLength = 2)]
         public string Location { get; set; } = null!;
 
+        [Range(-90, 90, ErrorMessage = "Географската ширина трябва да е между -90 и 90.")]
+        public double? Latitude { get; set; }
+
+        [Range(-180, 180, ErrorMessage = "Географската дължина трябва да е между -180 и 180.")]
+        public double? Longitude { get; set; }
+
         public string? CreatedById { get; set; }
     }
 }

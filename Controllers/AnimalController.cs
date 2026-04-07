@@ -16,13 +16,15 @@ namespace Animatch.Controllers
         private readonly UserManager<IdentityUser> userManager;
         private readonly IAnimalService animalService;
         private readonly ICategoryService categoryService;
+        private readonly IEventService eventService;
 
-        public AnimalController(IConfiguration configuration, UserManager<IdentityUser> userManager, IAnimalService animalService, ICategoryService categoryService)
+        public AnimalController(IConfiguration configuration, UserManager<IdentityUser> userManager, IAnimalService animalService, ICategoryService categoryService, IEventService eventService)
         {
             this.configuration = configuration;
             this.userManager = userManager;
             this.animalService = animalService;
             this.categoryService = categoryService;
+            this.eventService = eventService;
         }
 
         [HttpGet]
@@ -75,13 +77,19 @@ namespace Animatch.Controllers
                 ? await userManager.GetRolesAsync(currentUser)
                 : new List<string>();
             var roleName = roles.FirstOrDefault() ?? "User";
+            var canCreateEvents = roles.Contains("Organizer") || roles.Contains("Administrator");
+            var myEvents = (string.IsNullOrEmpty(userId) || !canCreateEvents)
+                ? Enumerable.Empty<Event>()
+                : await eventService.GetByCreatorAsync(userId);
 
             var viewModel = new Animatch.ViewModels.ProfileViewModel
             {
                 Username = User.Identity?.Name ?? "Потребител",
                 Email = User.FindFirstValue(ClaimTypes.Email) ?? "Няма имейл",
                 Role = roleName,
-                MyAnimals = myAnimals
+                MyAnimals = myAnimals,
+                CanCreateEvents = canCreateEvents,
+                MyEvents = myEvents
             };
 
             return View(viewModel);
@@ -325,6 +333,11 @@ namespace Animatch.Controllers
 
         private bool IsOwner(Animal animal)
         {
+            if (User.IsInRole("Administrator"))
+            {
+                return true;
+            }
+
             var userId = GetUserId();
             return !string.IsNullOrEmpty(userId) && animal.OwnerId == userId;
         }

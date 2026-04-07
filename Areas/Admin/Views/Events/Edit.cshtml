@@ -44,6 +44,18 @@
                     <textarea asp-for="Description" class="form-control" rows="6"></textarea>
                     <span asp-validation-for="Description" class="text-danger"></span>
                 </div>
+
+                <div>
+                    <label asp-for="Latitude" class="event-form-label">Ширина (Lat)</label>
+                    <input asp-for="Latitude" type="number" step="any" class="form-control" placeholder="43.06444117095392" />
+                    <span asp-validation-for="Latitude" class="text-danger"></span>
+                </div>
+
+                <div>
+                    <label asp-for="Longitude" class="event-form-label">Дължина (Lng)</label>
+                    <input asp-for="Longitude" type="number" step="any" class="form-control" placeholder="25.590345964587424" />
+                    <span asp-validation-for="Longitude" class="text-danger"></span>
+                </div>
             </div>
 
             <div class="event-admin-actions">

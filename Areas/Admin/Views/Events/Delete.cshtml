@@ -26,6 +26,13 @@
                 <span class="event-meta-label">Локация</span>
                 <span class="event-meta-value"><i class="fas fa-location-dot me-1"></i>@Model.Location</span>
             </div>
+            @if (Model.Latitude.HasValue && Model.Longitude.HasValue)
+            {
+                <div class="event-meta-item">
+                    <span class="event-meta-label">Координати</span>
+                    <span class="event-meta-value">@Model.Latitude.Value.ToString("F14"), @Model.Longitude.Value.ToString("F14")</span>
+                </div>
+            }
         </div>
         <div class="event-description">@Model.Description</div>
 

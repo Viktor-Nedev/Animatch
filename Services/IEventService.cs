@@ -5,6 +5,8 @@ namespace Animatch.Services
     public interface IEventService
     {
         Task<IEnumerable<Event>> GetAllAsync();
+        Task<IEnumerable<Event>> GetWithCoordinatesAsync();
+        Task<IEnumerable<Event>> GetByCreatorAsync(string creatorId);
         Task<(IEnumerable<Event> Items, int TotalCount)> GetPagedAsync(string? searchTerm, string? location, int page, int pageSize);
         Task<Event?> GetByIdAsync(int id);
         Task AddAsync(Event ev);

@@ -15,7 +15,28 @@ namespace Animatch.Services
 
         public async Task<IEnumerable<Event>> GetAllAsync()
         {
-            return await context.Set<Event>().AsNoTracking().ToListAsync();
+            return await context.Set<Event>()
+                .AsNoTracking()
+                .OrderByDescending(e => e.Date)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Event>> GetWithCoordinatesAsync()
+        {
+            return await context.Set<Event>()
+                .AsNoTracking()
+                .Where(e => e.Latitude.HasValue && e.Longitude.HasValue)
+                .OrderByDescending(e => e.Date)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Event>> GetByCreatorAsync(string creatorId)
+        {
+            return await context.Set<Event>()
+                .AsNoTracking()
+                .Where(e => e.CreatedById == creatorId)
+                .OrderByDescending(e => e.Date)
+                .ToListAsync();
         }
 
         public async Task<(IEnumerable<Event> Items, int TotalCount)> GetPagedAsync(string? searchTerm, string? location, int page, int pageSize)
